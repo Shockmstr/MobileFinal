@@ -7,9 +7,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class JDBCModel {
+public class JDBCUtils {
     @SuppressLint("NewApi")
-    public Connection getMyConnection(){
+    public static Connection getMyConnection(){
         StrictMode.ThreadPolicy threadPolicy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(threadPolicy);
         Connection conn = null;
