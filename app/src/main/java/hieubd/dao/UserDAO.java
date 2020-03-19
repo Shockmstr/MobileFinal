@@ -81,4 +81,39 @@ public class UserDAO {
         }
         return null;
     }
+
+    public UserDTO getUserByUsername(String username){
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try{
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "select FullName, Role from UserInfo where Username = ?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, username);
+                rs = stm.executeQuery();
+                if (rs.next()){
+                    String fullName = rs.getString("FullName");
+                    String role = rs.getString("Role");
+                    UserDTO dto = new UserDTO();
+                    dto.setFullName(fullName);
+                    dto.setRole(Role.valueOf(role));
+                    dto.setUsername(username);
+                    return dto;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if (rs != null) rs.close();
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
 }

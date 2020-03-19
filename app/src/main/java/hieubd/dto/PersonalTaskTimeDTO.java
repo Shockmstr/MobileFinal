@@ -3,20 +3,20 @@ package hieubd.dto;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class PersonalWorkTimeDTO implements Serializable {
+public class PersonalTaskTimeDTO implements Serializable {
     private int id;
     private Timestamp timeBegin;
     private Timestamp timeFinish;
     private Timestamp timeCreated;
 
-    public PersonalWorkTimeDTO(int id, Timestamp timeBegin, Timestamp timeFinish, Timestamp timeCreated) {
+    public PersonalTaskTimeDTO(int id, Timestamp timeBegin, Timestamp timeFinish, Timestamp timeCreated) {
         this.id = id;
         this.timeBegin = timeBegin;
         this.timeFinish = timeFinish;
         this.timeCreated = timeCreated;
     }
 
-    public PersonalWorkTimeDTO() {
+    public PersonalTaskTimeDTO() {
     }
 
     public int getId() {

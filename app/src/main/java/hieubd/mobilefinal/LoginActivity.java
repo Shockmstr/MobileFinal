@@ -32,7 +32,8 @@ public class LoginActivity extends AppCompatActivity {
         if (result != Role.None){
             switch (result){
                 case User:
-                    Intent intent = new Intent(this, MainActivity.class);
+                    Intent intent = new Intent(this, UserActivity.class);
+                    intent.putExtra("USERNAME", edtUsername.getText().toString());
                     startActivity(intent);
                     break;
                 case Admin:

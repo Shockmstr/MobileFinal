@@ -19,14 +19,14 @@
         android:shadowDy="4"
         android:shadowRadius="2"
         android:textAllCaps="true"
-        android:textSize="50dp"
+        android:textSize="50sp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Username:"
-        android:textSize="20dp"/>
+        android:textSize="20sp"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Password:"
-        android:textSize="20dp"/>
+        android:textSize="20sp"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
         android:id="@+id/edtPassword"/>
 
     <Button
-        android:layout_width="237dp"
+        android:layout_width="237sp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Login"

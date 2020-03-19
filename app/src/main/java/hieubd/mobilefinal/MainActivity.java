@@ -2,6 +2,7 @@ package hieubd.mobilefinal;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 
@@ -16,20 +17,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getInfo();
        // debugGetInfo();
+
     }
 
+
     private void getInfo(){
-        EditText edtFName = findViewById(R.id.edtFName);
-        EditText edtRole = findViewById(R.id.edtRole);
-        UserDAO dao = new UserDAO();
-        UserDTO dto = dao.getUserById(1);
-        edtFName.setText(dto.getFullName());
-        edtRole.setText(dto.getRole().name());
+        EditText edtVTN = findViewById(R.id.edtViewTaskName);
+        EditText edtVTD = findViewById(R.id.edtViewTaskDesc);
+        Intent intent = this.getIntent();
+        edtVTN.setText(intent.getStringExtra("taskname"));
+        edtVTD.setText(intent.getStringExtra("taskdesc"));
     }
 
     private void debugGetInfo(){
-        EditText edtFName = findViewById(R.id.edtFName);
-        EditText edtRole = findViewById(R.id.edtRole);
+        EditText edtFName = findViewById(R.id.edtViewTaskName);
+        EditText edtRole = findViewById(R.id.edtViewTaskDesc);
         edtFName.setText("Ajax");
         edtRole.setText("user");
     }

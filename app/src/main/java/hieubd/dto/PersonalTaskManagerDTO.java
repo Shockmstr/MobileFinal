@@ -3,16 +3,16 @@ package hieubd.dto;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
-public class PersonalWorkManagerDTO implements Serializable {
+public class PersonalTaskManagerDTO implements Serializable {
     private int id;
     private String managerDescription;
     private int managerMark;
     private Timestamp managerCommentBeginTime;
 
-    public PersonalWorkManagerDTO() {
+    public PersonalTaskManagerDTO() {
     }
 
-    public PersonalWorkManagerDTO(int id, String managerDescription, int managerMark, Timestamp managerCommentBeginTime) {
+    public PersonalTaskManagerDTO(int id, String managerDescription, int managerMark, Timestamp managerCommentBeginTime) {
         this.id = id;
         this.managerDescription = managerDescription;
         this.managerMark = managerMark;

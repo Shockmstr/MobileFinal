@@ -2,7 +2,7 @@ package hieubd.dto;
 
 import java.io.Serializable;
 
-public class PersonalWorkInfoDTO implements Serializable {
+public class PersonalTaskInfoDTO implements Serializable {
     private int id;
     private String name;
     private String source;
@@ -15,11 +15,11 @@ public class PersonalWorkInfoDTO implements Serializable {
     private String confirmation;
     private byte[] confirmationImage;
 
-    public PersonalWorkInfoDTO() {
+    public PersonalTaskInfoDTO() {
 
     }
 
-    public PersonalWorkInfoDTO(int id, String name, String source, String description, String handlingContent, String status, int creatorId, Role creatorRole, int workHandlerId, String confirmation, byte[] confirmationImage) {
+    public PersonalTaskInfoDTO(int id, String name, String source, String description, String handlingContent, String status, int creatorId, Role creatorRole, int workHandlerId, String confirmation, byte[] confirmationImage) {
         this.id = id;
         this.name = name;
         this.source = source;
