@@ -5,16 +5,16 @@ import java.sql.Timestamp;
 
 public class PersonalTaskManagerDTO implements Serializable {
     private int id;
-    private String managerDescription;
+    private String managerComment;
     private int managerMark;
     private Timestamp managerCommentBeginTime;
 
     public PersonalTaskManagerDTO() {
     }
 
-    public PersonalTaskManagerDTO(int id, String managerDescription, int managerMark, Timestamp managerCommentBeginTime) {
+    public PersonalTaskManagerDTO(int id, String managerComment, int managerMark, Timestamp managerCommentBeginTime) {
         this.id = id;
-        this.managerDescription = managerDescription;
+        this.managerComment = managerComment;
         this.managerMark = managerMark;
         this.managerCommentBeginTime = managerCommentBeginTime;
     }
@@ -27,12 +27,12 @@ public class PersonalTaskManagerDTO implements Serializable {
         this.id = id;
     }
 
-    public String getManagerDescription() {
-        return managerDescription;
+    public String getManagerComment() {
+        return managerComment;
     }
 
-    public void setManagerDescription(String managerDescription) {
-        this.managerDescription = managerDescription;
+    public void setManagerComment(String managerComment) {
+        this.managerComment = managerComment;
     }
 
     public int getManagerMark() {

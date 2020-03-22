@@ -1,19 +1,22 @@
 package hieubd.mobilefinal;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.Serializable;
+
 import hieubd.dao.UserDAO;
 import hieubd.dto.UserDTO;
 
 public class UserActivity extends AppCompatActivity {
-    private static int REQUEST_CODE = 6789;
+    private static int REQUEST_CREATE_CODE = 6789;
     private String taskName, taskDesc;
+    private String username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,24 +26,28 @@ public class UserActivity extends AppCompatActivity {
 
     private void getWelcome(){
         Intent intent = this.getIntent();
-        String username = intent.getStringExtra("USERNAME");
+        username = intent.getStringExtra("USERNAME");
         UserDAO dao = new UserDAO();
         UserDTO dto = dao.getUserByUsername(username);
         TextView txtWelcome = findViewById(R.id.txtWelcome);
         String welcome = txtWelcome.getText().toString();
-        welcome += (" " + dto.getFullName());
+        welcome += dto.getFullName();
         txtWelcome.setText(welcome);
     }
 
     public void onClickCreateTask(View view) {
         Intent intent = new Intent(this, TaskInfoActivity.class);
-        startActivityForResult(intent, REQUEST_CODE);
+        intent.putExtra("USERNAME", username);
+        UserDAO dao = new UserDAO();
+        UserDTO dto = dao.getUserByUsername(username);
+        intent.putExtra("ROLE", (Serializable)dto.getRole());
+        startActivityForResult(intent, REQUEST_CREATE_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE){
+        if (requestCode == REQUEST_CREATE_CODE){
             if (resultCode == RESULT_OK){
                 taskName = data.getStringExtra("taskname");
                 taskDesc = data.getStringExtra("taskdesc");
@@ -49,9 +56,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     public void onClickViewTask(View view) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("taskname", taskName);
-        intent.putExtra("taskdesc", taskDesc);
+        Intent intent = new Intent(this, TaskListActivity.class);
         startActivity(intent);
     }
 }

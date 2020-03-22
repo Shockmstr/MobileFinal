@@ -10,10 +10,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="86dp"
-        android:text="Welcome, "
-        android:textSize="30dp"
+        android:text="Welcome back, "
+        android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:fontFamily="monospace"
+        android:textColor="#1F6838"
         android:id="@+id/txtWelcome"/>
 
     <Button

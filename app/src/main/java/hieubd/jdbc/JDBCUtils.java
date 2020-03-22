@@ -3,6 +3,8 @@ package hieubd.jdbc;
 import android.annotation.SuppressLint;
 import android.os.StrictMode;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -30,5 +32,16 @@ public class JDBCUtils {
             e.printStackTrace();
         }
         return conn;
+    }
+
+    public static String fromBytesToString(byte[] imageBytes){
+        Charset charset = StandardCharsets.UTF_16;
+        String imagePath = new String(imageBytes, charset);
+        return imagePath;
+    }
+
+    public static byte[] fromStringToBytes(String imagePath){
+        Charset charset = StandardCharsets.UTF_16;
+        return imagePath.getBytes(charset);
     }
 }

@@ -50,4 +50,5 @@ public class PersonalTaskTimeDTO implements Serializable {
     public void setTimeCreated(Timestamp timeCreated) {
         this.timeCreated = timeCreated;
     }
+
 }

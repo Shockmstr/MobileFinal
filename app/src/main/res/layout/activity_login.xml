@@ -15,9 +15,9 @@
         android:fontFamily="serif-monospace"
         android:textColor="#31C690"
         android:shadowColor="#000000"
-        android:shadowDx="4"
-        android:shadowDy="4"
-        android:shadowRadius="2"
+        android:shadowDx="5"
+        android:shadowDy="5"
+        android:shadowRadius="3"
         android:textAllCaps="true"
         android:textSize="50sp"
         android:textStyle="bold" />

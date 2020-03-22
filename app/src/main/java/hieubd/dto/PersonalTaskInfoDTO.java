@@ -9,9 +9,9 @@ public class PersonalTaskInfoDTO implements Serializable {
     private String description;
     private String handlingContent;
     private String status;
-    private int creatorId;
+    private String creator;
     private Role creatorRole;
-    private int workHandlerId;
+    private String taskHandler;
     private String confirmation;
     private byte[] confirmationImage;
 
@@ -19,16 +19,14 @@ public class PersonalTaskInfoDTO implements Serializable {
 
     }
 
-    public PersonalTaskInfoDTO(int id, String name, String source, String description, String handlingContent, String status, int creatorId, Role creatorRole, int workHandlerId, String confirmation, byte[] confirmationImage) {
-        this.id = id;
+    public PersonalTaskInfoDTO(String name, String source, String description, String handlingContent, String status, String creator, String taskHandler, String confirmation, byte[] confirmationImage) {
         this.name = name;
         this.source = source;
         this.description = description;
         this.handlingContent = handlingContent;
         this.status = status;
-        this.creatorId = creatorId;
-        this.creatorRole = creatorRole;
-        this.workHandlerId = workHandlerId;
+        this.creator = creator;
+        this.taskHandler = taskHandler;
         this.confirmation = confirmation;
         this.confirmationImage = confirmationImage;
     }
@@ -81,28 +79,20 @@ public class PersonalTaskInfoDTO implements Serializable {
         this.status = status;
     }
 
-    public int getCreatorId() {
-        return creatorId;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setCreatorId(int creatorId) {
-        this.creatorId = creatorId;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
-    public Role getCreatorRole() {
-        return creatorRole;
+    public String getTaskHandler() {
+        return taskHandler;
     }
 
-    public void setCreatorRole(Role creatorRole) {
-        this.creatorRole = creatorRole;
-    }
-
-    public int getWorkHandlerId() {
-        return workHandlerId;
-    }
-
-    public void setWorkHandlerId(int workHandlerId) {
-        this.workHandlerId = workHandlerId;
+    public void setTaskHandler(String taskHandler) {
+        this.taskHandler = taskHandler;
     }
 
     public String getConfirmation() {
@@ -119,5 +109,13 @@ public class PersonalTaskInfoDTO implements Serializable {
 
     public void setConfirmationImage(byte[] confirmationImage) {
         this.confirmationImage = confirmationImage;
+    }
+
+    public Role getCreatorRole() {
+        return creatorRole;
+    }
+
+    public void setCreatorRole(Role creatorRole) {
+        this.creatorRole = creatorRole;
     }
 }

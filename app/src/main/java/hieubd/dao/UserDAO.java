@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 import hieubd.dto.Role;
 import hieubd.dto.UserDTO;
-import hieubd.jdbc.JDBCController;
 import hieubd.jdbc.JDBCUtils;
 
 public class UserDAO {
