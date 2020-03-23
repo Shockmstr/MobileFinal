@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
@@ -13,13 +12,13 @@ import java.io.Serializable;
 import hieubd.dao.UserDAO;
 import hieubd.dto.UserDTO;
 
-public class UserActivity extends AppCompatActivity {
+public class ManagerActivity extends AppCompatActivity {
     private static int REQUEST_CREATE_CODE = 6789;
     private String username;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
+        setContentView(R.layout.activity_manager);
         getWelcome();
     }
 
@@ -28,7 +27,7 @@ public class UserActivity extends AppCompatActivity {
         username = intent.getStringExtra("USERNAME");
         UserDAO dao = new UserDAO();
         UserDTO dto = dao.getUserByUsername(username);
-        TextView txtWelcome = findViewById(R.id.txtWelcome);
+        TextView txtWelcome = findViewById(R.id.txtManagerWelcome);
         String welcome = txtWelcome.getText().toString();
         welcome += dto.getFullName();
         txtWelcome.setText(welcome);
@@ -43,18 +42,14 @@ public class UserActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_CREATE_CODE);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CREATE_CODE){
-            if (resultCode == RESULT_OK){
-
-            }
-        }
+    public void onClickViewYourTask(View view) {
+        Intent intent = new Intent(this, TaskListActivity.class);
+        intent.putExtra("USERNAME", username);
+        startActivity(intent);
     }
 
-    public void onClickViewTask(View view) {
-        Intent intent = new Intent(this, TaskListActivity.class);
+    public void onClickViewUserTask(View view) {
+        Intent intent = new Intent(this, TaskManagerListActivity.class);
         intent.putExtra("USERNAME", username);
         startActivity(intent);
     }

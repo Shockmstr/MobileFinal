@@ -1,14 +1,12 @@
 package hieubd.mobilefinal;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.PopupWindow;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import hieubd.dao.UserDAO;
 import hieubd.dto.Role;
@@ -36,9 +34,12 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra("USERNAME", edtUsername.getText().toString());
                     startActivity(intent);
                     break;
-                case Admin:
-                    break;
                 case Manager:
+                    Intent intent2 = new Intent(this, ManagerActivity.class);
+                    intent2.putExtra("USERNAME", edtUsername.getText().toString());
+                    startActivity(intent2);
+                    break;
+                case Admin:
                     break;
                 default:
                     break;

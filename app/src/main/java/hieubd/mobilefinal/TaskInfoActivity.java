@@ -20,41 +20,38 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import hieubd.dao.PersonalTaskInfoDAO;
-import hieubd.dao.PersonalTaskManagerDAO;
 import hieubd.dao.PersonalTaskTimeDAO;
 import hieubd.dto.PersonalTaskInfoDTO;
-import hieubd.dto.PersonalTaskManagerDTO;
 import hieubd.dto.PersonalTaskTimeDTO;
 import hieubd.dto.Role;
+import hieubd.jdbc.JDBCUtils;
 
 public class TaskInfoActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private int getDateNumberFlag = -1;
-    private String selectedStatus, selectedSource, selectedConfirm;
+    private String selectedStatus, selectedSource;
     private Role userRole;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_info);
-        createSpinnerStatus();
-        createSpinnerConfirmation();
-        autoFillCreatorAndWorkHandler();
-        filterRoleForTask();
-    }
-
-    private void filterRoleForTask(){
         Intent intent = this.getIntent();
         userRole = (Role) intent.getSerializableExtra("ROLE");
+        autoFillCreatorAndWorkHandler();
+        createSpinnerStatus();
+        createSpinnerSource();
     }
 
     private void autoFillCreatorAndWorkHandler(){
         Intent intent = this.getIntent();
-        String username = intent.getStringExtra("USERNAME");
+        username = intent.getStringExtra("USERNAME");
         EditText edtCreator = findViewById(R.id.edtCreator);
         edtCreator.setText(username);
         EditText edtTaskHandler = findViewById(R.id.edtTaskHandler);
@@ -64,7 +61,7 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
     private void createSpinnerStatus(){
         Spinner spnStatus = findViewById(R.id.spnStatus);
         List<String> statuses = new ArrayList<>();
-        statuses.add("Not Started");
+        statuses.add("Not started");
         statuses.add("In progress");
         statuses.add("Finished");
         statuses.add("Overdue");
@@ -85,18 +82,23 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
         });
     }
 
-    private void createSpinnerConfirmation(){
-        Spinner spnConfirm = findViewById(R.id.spnConfirmation);
-        List<String> confirms = new ArrayList<>();
-        confirms.add("Done");
-        confirms.add("Unable to start");
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, confirms);
+
+    private void createSpinnerSource(){
+        Spinner spnSource = findViewById(R.id.spnSource);
+        PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
+        List<String> adapterSource = new ArrayList<>();
+        adapterSource.add("New");
+        if (infoDAO.getAllTaskIdAndNameByTaskHandler(username) != null) {
+            adapterSource.addAll(infoDAO.getAllTaskIdAndNameByTaskHandler(username));
+        }
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, adapterSource);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnConfirm.setAdapter(adapter);
-        spnConfirm.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        spnSource.setAdapter(adapter);
+        spnSource.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedConfirm = adapterView.getItemAtPosition(i).toString();
+                selectedSource = adapterView.getItemAtPosition(i).toString();
+                operateSource(selectedSource);
             }
 
             @Override
@@ -104,6 +106,38 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
 
             }
         });
+    }
+
+    private void operateSource(String selectedSource){
+        if (!selectedSource.equalsIgnoreCase("new")){
+            String[] selectedSourcePart =  selectedSource.split(" - ");
+            String id = selectedSourcePart[0];
+            PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
+            PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
+            PersonalTaskInfoDTO infoDTO = infoDAO.getTaskById(Integer.parseInt(id));
+            PersonalTaskTimeDTO timeDTO = timeDAO.getTaskById(Integer.parseInt(id));
+
+            EditText edtEditDesc = findViewById(R.id.edtDescription);
+            EditText edtEditHandlingContent = findViewById(R.id.edtHandlingContent);
+            TextView txtTimeBegin = findViewById(R.id.txtTimeBegin);
+            TextView txtTimeFinish = findViewById(R.id.txtTimeFinish);
+            Spinner spnStatus = findViewById(R.id.spnStatus);
+
+            edtEditDesc.setText(infoDTO.getDescription());
+            edtEditHandlingContent.setText(infoDTO.getHandlingContent());
+            txtTimeBegin.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeBegin()));
+            txtTimeFinish.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeFinish()));
+            spnStatus.setSelection(getIndexOfValueFromSpinner(spnStatus, infoDTO.getStatus()));
+        }
+    }
+
+    private int getIndexOfValueFromSpinner(Spinner spn, String str){
+        for (int i = 0; i < spn.getCount(); i++) {
+            if (spn.getItemAtPosition(i).toString().equalsIgnoreCase(str)){
+                return i;
+            }
+        }
+        return 0;
     }
 
     @Override
@@ -118,14 +152,6 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
                 TextView txtTimeFinish  = findViewById(R.id.txtTimeFinish);
                 txtTimeFinish.setText(date);
                 break;
-            case 3:
-                TextView txtTimeCreated  = findViewById(R.id.txtTimeCreated);
-                txtTimeCreated.setText(date);
-                break;
-            case 4:
-                TextView txtTimeComment  = findViewById(R.id.txtTimeComment);
-                txtTimeComment.setText(date);
-                break;
             default:
                 break;
         }
@@ -133,27 +159,23 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
     }
 
     public void clickGetTimeBegin(View view) {
-        DialogFragment datePickerFragment = new DatePickerFragment();
+        DialogFragment datePickerFragment = new DatePickerFragment(1);
         datePickerFragment.show(getFragmentManager(), "Time Begin");
         getDateNumberFlag = 1;
     }
 
     public void clickGetTimeFinish(View view) {
-        DialogFragment datePickerFragment = new DatePickerFragment();
+        DialogFragment datePickerFragment = new DatePickerFragment(1);
         datePickerFragment.show(getFragmentManager(), "Time Finish");
         getDateNumberFlag = 2;
     }
 
-    public void clickGetTimeCreated(View view) {
-        DialogFragment datePickerFragment = new DatePickerFragment();
-        datePickerFragment.show(getFragmentManager(), "Time Created");
-        getDateNumberFlag = 3;
-    }
-
-    public void clickGetTimeComment(View view) {
-        DialogFragment datePickerFragment = new DatePickerFragment();
-        datePickerFragment.show(getFragmentManager(), "Time Comment");
-        getDateNumberFlag = 4;
+    private String getTimeCreated() {
+        Calendar calendar = Calendar.getInstance();
+        Date currentDate = calendar.getTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+        String timeCreated = sdf.format(currentDate);
+        return timeCreated;
     }
 
     private Timestamp changeStringToTime(String time) throws Exception{
@@ -169,25 +191,17 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             String name = ((EditText)findViewById(R.id.edtTaskName)).getText().toString();
             String description = ((EditText)findViewById(R.id.edtDescription)).getText().toString();
             String handlingContent = ((EditText)findViewById(R.id.edtHandlingContent)).getText().toString();
+            String source = selectedSource;
             String status = selectedStatus;
-            String confirm = selectedConfirm;
+            String confirm = "Not Confirmed";
             String txtTimeBegin = ((TextView)findViewById(R.id.txtTimeBegin)).getText().toString();
             Timestamp dateBegin = changeStringToTime(txtTimeBegin);
             String txtTimeFinish = ((TextView)findViewById(R.id.txtTimeFinish)).getText().toString();
             Timestamp dateFinish = changeStringToTime(txtTimeFinish);
-            String txtTimeCreated = ((TextView)findViewById(R.id.txtTimeCreated)).getText().toString();
+            String txtTimeCreated = getTimeCreated();
             Timestamp dateCreated = changeStringToTime(txtTimeCreated);
             String creator = ((EditText)findViewById(R.id.edtCreator)).getText().toString();
             String taskHandler = ((EditText)findViewById(R.id.edtTaskHandler)).getText().toString();
-            String comment = null;
-            String mark = null;
-            Timestamp dateComment = null;
-            if (userRole == Role.Admin){
-                comment = ((EditText)findViewById(R.id.edtComment)).getText().toString();
-                mark = ((EditText)findViewById(R.id.edtMark)).getText().toString();
-                String txtTimeComment = ((TextView)findViewById(R.id.txtTimeComment)).getText().toString();
-                dateComment = changeStringToTime(txtTimeComment);
-            }
 
             String test = "image.png";
             Charset charset = StandardCharsets.UTF_16;
@@ -196,22 +210,15 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
 
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-            PersonalTaskManagerDAO taskManagerDAO = new PersonalTaskManagerDAO();
-            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, null, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
+            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, source, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
             System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
             if (infoDAO.createNewTask(infoDTO, userRole)){
                 int id = infoDAO.getNewTaskId();
                 infoDTO.setId(id);
                 PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(id, dateBegin, dateFinish, dateCreated);
                 System.out.println(id + dateBegin.toString() + dateFinish.toString() + dateCreated.toString());
-                PersonalTaskManagerDTO managerDTO = null;
                 if (timeDAO.createNewTaskTime(timeDTO));
                 else error += "\nCannot create task! Please check the date inputs again.";
-                if (userRole == Role.Admin) {
-                    managerDTO = new PersonalTaskManagerDTO(id, comment, Integer.parseInt(mark), dateComment);
-                    if (taskManagerDAO.createNewTaskManager(managerDTO)) ;
-                    else error += "\nCannot create task! Please check Manager part again.";
-                }
             }else{
                 error += "\nCannot create task! Please check the details again.";
             }
@@ -231,6 +238,4 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
     public void clickUploadImage(View view) {
     }
 
-    public void onClickSubmitEdit(View view) {
-    }
 }

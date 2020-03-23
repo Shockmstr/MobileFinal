@@ -1,6 +1,7 @@
 package hieubd.mobilefinal;
 
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -18,12 +19,20 @@ import java.util.Calendar;
  * A simple {@link Fragment} subclass.
  */
 public class DatePickerFragment extends DialogFragment {
-
+    private int flag;
 
     public DatePickerFragment() {
         // Required empty public constructor
     }
 
+    /**
+     * 1: TaskInfoActivity
+     * 2: TaskViewDetailActivity
+     */
+    @SuppressLint("ValidFragment")
+    public DatePickerFragment(int flag){
+        this.flag = flag;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +48,17 @@ public class DatePickerFragment extends DialogFragment {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);// + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        return new DatePickerDialog(getActivity(), (TaskInfoActivity)getActivity(), year, month, day);
+        DatePickerDialog datePickerDialog = null;
+        switch (flag){
+            case 1:
+                datePickerDialog = new DatePickerDialog(getActivity(), (TaskInfoActivity)getActivity(), year, month, day);
+                break;
+            case 2:
+                datePickerDialog = new DatePickerDialog(getActivity(), (TaskViewDetailActivity)getActivity(), year, month, day);
+                break;
+            default:
+                break;
+        }
+        return datePickerDialog;
     }
 }

@@ -88,14 +88,16 @@ public class UserDAO {
         try{
             conn = JDBCUtils.getMyConnection();
             if (conn != null){
-                String sql = "select FullName, Role from UserInfo where Username = ?";
+                String sql = "select UserID, FullName, Role from UserInfo where Username = ?";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, username);
                 rs = stm.executeQuery();
                 if (rs.next()){
+                    int id = rs.getInt("UserID");
                     String fullName = rs.getString("FullName");
                     String role = rs.getString("Role");
                     UserDTO dto = new UserDTO();
+                    dto.setId(id);
                     dto.setFullName(fullName);
                     dto.setRole(Role.valueOf(role));
                     dto.setUsername(username);

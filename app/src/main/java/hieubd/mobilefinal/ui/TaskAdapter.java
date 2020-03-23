@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import hieubd.dto.PersonalTaskInfoDTO;
@@ -22,6 +23,7 @@ public class TaskAdapter extends BaseAdapter {
     public TaskAdapter(List<PersonalTaskInfoDTO> taskInfoDTOList, List<PersonalTaskTimeDTO> taskTimeDTOList) {
         this.taskInfoDTOList = taskInfoDTOList;
         this.taskTimeDTOList = taskTimeDTOList;
+        createWhenNull();
     }
 
     public void setTaskInfoDTOList(List<PersonalTaskInfoDTO> taskInfoDTOList) {
@@ -34,17 +36,29 @@ public class TaskAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        createWhenNull();
         return taskInfoDTOList.size();
     }
 
     @Override
     public Object getItem(int i) {
+        createWhenNull();
         return taskInfoDTOList.get(i);
     }
 
     @Override
     public long getItemId(int i) {
+        createWhenNull();
         return taskInfoDTOList.indexOf(taskInfoDTOList.get(i));
+    }
+
+    private void createWhenNull(){
+        if (taskInfoDTOList == null){
+            taskInfoDTOList = new ArrayList<>();
+        }
+        if (taskTimeDTOList == null){
+            taskTimeDTOList = new ArrayList<>();
+        }
     }
 
     @Override
@@ -53,6 +67,7 @@ public class TaskAdapter extends BaseAdapter {
             LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
             view = inflater.inflate(R.layout.item, viewGroup, false);
         }
+        createWhenNull();
         PersonalTaskInfoDTO infoDTO = taskInfoDTOList.get(i);
         PersonalTaskTimeDTO timeDTO = taskTimeDTOList.get(i);
         TextView txtName = view.findViewById(R.id.txtItemName);

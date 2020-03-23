@@ -5,18 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".UserActivity">
+    tools:context=".ManagerActivity">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="86sp"
-        android:text="Hello, "
+        android:text="Welcome Back, "
         android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center"
         android:fontFamily="monospace"
         android:textColor="#1F6838"
-        android:id="@+id/txtWelcome"/>
+        android:id="@+id/txtManagerWelcome"/>
 
     <Button
         android:layout_width="match_parent"
@@ -27,6 +27,11 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View Task"
-        android:onClick="onClickViewTask"/>
+        android:text="View Your Task"
+        android:onClick="onClickViewYourTask"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View/ Comment User Task"
+        android:onClick="onClickViewUserTask"/>
 </LinearLayout>

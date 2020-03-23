@@ -11,7 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TaskViewDetailActivity"></activity>
+        <activity android:name=".TaskManagerListActivity"></activity>
+        <activity android:name=".ManagerActivity" />
+        <activity android:name=".TaskViewDetailActivity" />
         <activity android:name=".TaskListActivity" />
         <activity android:name=".TaskInfoActivity" />
         <activity android:name=".UserActivity" />

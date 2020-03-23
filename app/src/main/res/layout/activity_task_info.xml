@@ -17,7 +17,7 @@
             android:layout_marginBottom="15sp"
             android:fontFamily="monospace"
             android:gravity="center"
-            android:text="-Personal Task-"
+            android:text="-New Task-"
             android:textColor="@android:color/black"
             android:textAllCaps="true"
             android:textSize="40dp"
@@ -82,7 +82,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Time Begin:"
+                android:text="Time Begin: "
                 android:textSize="20sp" />
 
             <TextView
@@ -108,7 +108,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Time Finish:"
+                android:text="Time Finish: "
                 android:textSize="20sp" />
 
             <TextView
@@ -155,31 +155,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/edtCreator"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time Created:"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/txtTimeCreated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="DD/MM/YYYY"
-                android:textSize="20sp" />
-
-            <Button
-                android:id="@+id/btnTimeCreated"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Get Date"
-                android:onClick="clickGetTimeCreated"/>
-        </LinearLayout>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -195,15 +170,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Task Confirmation:"
-                android:textSize="20sp"/>
-            <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/spnConfirmation"/>
         </LinearLayout>
         <Button
             android:layout_width="match_parent"
@@ -218,72 +184,6 @@
             android:layout_height="wrap_content"
             android:id="@+id/txtConfirmationImage"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/border"
-            android:padding="10sp"
-            android:layout_marginTop="10sp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="- Manager Part -"
-                android:textColor="@android:color/black"
-                android:fontFamily="sans-serif"
-                android:gravity="center"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Comment:"
-                android:textSize="20sp"/>
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textMultiLine"
-                android:id="@+id/edtComment"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Mark:"
-                    android:textSize="20sp"/>
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:id="@+id/edtMark"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Time Comment:"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/txtTimeComment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="DD/MM/YYYY"
-                    android:textSize="20sp" />
-
-                <Button
-                    android:id="@+id/btnTimeComment"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Get Date"
-                    android:onClick="clickGetTimeComment"/>
-            </LinearLayout>
-        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
