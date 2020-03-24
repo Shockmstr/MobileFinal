@@ -11,8 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TaskManagerListActivity"></activity>
+        <activity android:name=".GroupDetailActivity"></activity>
+        <activity android:name=".ManageGroupActivity" />
+        <activity android:name=".userUI.UserListDetailActivity" />
+        <activity android:name=".userUI.UserListActivity" />
+        <activity android:name=".userUI.NewUserActivity" />
+        <activity android:name=".AdminActivity" />
+        <activity android:name=".TaskManagerListActivity" />
         <activity android:name=".ManagerActivity" />
+        <activity android:name=".TaskAdminListActivity" />
         <activity android:name=".TaskViewDetailActivity" />
         <activity android:name=".TaskListActivity" />
         <activity android:name=".TaskInfoActivity" />

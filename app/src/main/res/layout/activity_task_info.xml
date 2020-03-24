@@ -38,17 +38,6 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Source:"
-            android:textSize="20sp" />
-
-        <Spinner
-            android:id="@+id/spnSource"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:text="Description:"
             android:textSize="20sp" />
 
@@ -144,17 +133,6 @@
                 android:layout_marginStart="20sp" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10sp"
-            android:text="Creator:"
-            android:textSize="20sp" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/edtCreator"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -40,6 +40,9 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent2);
                     break;
                 case Admin:
+                    Intent intent3 = new Intent(this, AdminActivity.class);
+                    intent3.putExtra("USERNAME", edtUsername.getText().toString());
+                    startActivity(intent3);
                     break;
                 default:
                     break;

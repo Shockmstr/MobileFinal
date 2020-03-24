@@ -5,7 +5,6 @@ import java.io.Serializable;
 public class PersonalTaskInfoDTO implements Serializable {
     private int id;
     private String name;
-    private String source;
     private String description;
     private String handlingContent;
     private String status;
@@ -19,9 +18,8 @@ public class PersonalTaskInfoDTO implements Serializable {
 
     }
 
-    public PersonalTaskInfoDTO(String name, String source, String description, String handlingContent, String status, String creator, String taskHandler, String confirmation, byte[] confirmationImage) {
+    public PersonalTaskInfoDTO(String name, String description, String handlingContent, String status, String creator, String taskHandler, String confirmation, byte[] confirmationImage) {
         this.name = name;
-        this.source = source;
         this.description = description;
         this.handlingContent = handlingContent;
         this.status = status;
@@ -45,14 +43,6 @@ public class PersonalTaskInfoDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 
     public String getDescription() {

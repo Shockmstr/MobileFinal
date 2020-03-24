@@ -1,28 +1,31 @@
 package hieubd.dto;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 public class UserDTO implements Serializable {
     private int id;
     private String username;
     private String password;
     private String fullName;
-    private Timestamp timeWorkFrom;
-    private Timestamp timeWorkTo;
     private Role role;
     private int managerId;
 
     public UserDTO() {
     }
 
-    public UserDTO(int id, String username, String password, String fullName, Timestamp timeWorkFrom, Timestamp timeWorkTo, Role role, int managerId) {
+    public UserDTO(int id, String username, String password, String fullName, Role role, int managerId) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.fullName = fullName;
-        this.timeWorkFrom = timeWorkFrom;
-        this.timeWorkTo = timeWorkTo;
+        this.role = role;
+        this.managerId = managerId;
+    }
+
+    public UserDTO(String username, String password, String fullName, Role role, int managerId) {
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
         this.role = role;
         this.managerId = managerId;
     }
@@ -41,22 +44,6 @@ public class UserDTO implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public Timestamp getTimeWorkFrom() {
-        return timeWorkFrom;
-    }
-
-    public void setTimeWorkFrom(Timestamp timeWorkFrom) {
-        this.timeWorkFrom = timeWorkFrom;
-    }
-
-    public Timestamp getTimeWorkTo() {
-        return timeWorkTo;
-    }
-
-    public void setTimeWorkTo(Timestamp timeWorkTo) {
-        this.timeWorkTo = timeWorkTo;
     }
 
     public void setRole(Role role) {

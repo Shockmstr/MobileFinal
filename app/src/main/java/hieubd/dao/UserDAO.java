@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import hieubd.dto.Role;
 import hieubd.dto.UserDTO;
@@ -116,5 +118,102 @@ public class UserDAO {
             }
         }
         return null;
+    }
+
+    public List<UserDTO> getAllUserByRole(Role role){
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<UserDTO> result =  null;
+        try{
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "select UserID, Username, FullName, Password, ManagerID from UserInfo where Role = ?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, role.toString());
+                rs = stm.executeQuery();
+                while (rs.next()){
+                    if (result == null) result  = new ArrayList<>();
+                    int id = rs.getInt("UserID");
+                    String username = rs.getString("Username");
+                    String password = rs.getString("Password");
+                    String fullName = rs.getString("FullName");
+                    int managerId = rs.getInt("ManagerID");
+                    UserDTO dto = new UserDTO(id, username, password, fullName, role, managerId);
+                    result.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if (rs != null) rs.close();
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public boolean checkUsernameIsExisted(String username){
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try{
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "select UserID from UserInfo where Username = ?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, username);
+                rs = stm.executeQuery();
+                if (rs.next()) {
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if (rs != null) rs.close();
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public boolean createNewUser(UserDTO dto){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Insert into UserInfo values(?,?,?,?,?)";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, dto.getUsername());
+                stm.setString(2, dto.getPassword());
+                stm.setString(3, dto.getFullName());
+                stm.setString(4, dto.getRole().toString());
+                stm.setInt(5, dto.getManagerId());
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            try{
+                if (rs != null) rs.close();
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
     }
 }

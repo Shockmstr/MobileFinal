@@ -29,12 +29,11 @@ import hieubd.dao.PersonalTaskTimeDAO;
 import hieubd.dto.PersonalTaskInfoDTO;
 import hieubd.dto.PersonalTaskTimeDTO;
 import hieubd.dto.Role;
-import hieubd.jdbc.JDBCUtils;
 
 public class TaskInfoActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private int getDateNumberFlag = -1;
-    private String selectedStatus, selectedSource;
+    private String selectedStatus;
     private Role userRole;
     private String username;
 
@@ -46,14 +45,11 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
         userRole = (Role) intent.getSerializableExtra("ROLE");
         autoFillCreatorAndWorkHandler();
         createSpinnerStatus();
-        createSpinnerSource();
     }
 
     private void autoFillCreatorAndWorkHandler(){
         Intent intent = this.getIntent();
         username = intent.getStringExtra("USERNAME");
-        EditText edtCreator = findViewById(R.id.edtCreator);
-        edtCreator.setText(username);
         EditText edtTaskHandler = findViewById(R.id.edtTaskHandler);
         edtTaskHandler.setText(username);
     }
@@ -81,65 +77,6 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             }
         });
     }
-
-
-    private void createSpinnerSource(){
-        Spinner spnSource = findViewById(R.id.spnSource);
-        PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
-        List<String> adapterSource = new ArrayList<>();
-        adapterSource.add("New");
-        if (infoDAO.getAllTaskIdAndNameByTaskHandler(username) != null) {
-            adapterSource.addAll(infoDAO.getAllTaskIdAndNameByTaskHandler(username));
-        }
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, adapterSource);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnSource.setAdapter(adapter);
-        spnSource.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                selectedSource = adapterView.getItemAtPosition(i).toString();
-                operateSource(selectedSource);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-    }
-
-    private void operateSource(String selectedSource){
-        if (!selectedSource.equalsIgnoreCase("new")){
-            String[] selectedSourcePart =  selectedSource.split(" - ");
-            String id = selectedSourcePart[0];
-            PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
-            PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-            PersonalTaskInfoDTO infoDTO = infoDAO.getTaskById(Integer.parseInt(id));
-            PersonalTaskTimeDTO timeDTO = timeDAO.getTaskById(Integer.parseInt(id));
-
-            EditText edtEditDesc = findViewById(R.id.edtDescription);
-            EditText edtEditHandlingContent = findViewById(R.id.edtHandlingContent);
-            TextView txtTimeBegin = findViewById(R.id.txtTimeBegin);
-            TextView txtTimeFinish = findViewById(R.id.txtTimeFinish);
-            Spinner spnStatus = findViewById(R.id.spnStatus);
-
-            edtEditDesc.setText(infoDTO.getDescription());
-            edtEditHandlingContent.setText(infoDTO.getHandlingContent());
-            txtTimeBegin.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeBegin()));
-            txtTimeFinish.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeFinish()));
-            spnStatus.setSelection(getIndexOfValueFromSpinner(spnStatus, infoDTO.getStatus()));
-        }
-    }
-
-    private int getIndexOfValueFromSpinner(Spinner spn, String str){
-        for (int i = 0; i < spn.getCount(); i++) {
-            if (spn.getItemAtPosition(i).toString().equalsIgnoreCase(str)){
-                return i;
-            }
-        }
-        return 0;
-    }
-
     @Override
     public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
         String date = dayOfMonth + "/" + (month+1) + "/" + year;
@@ -191,7 +128,6 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             String name = ((EditText)findViewById(R.id.edtTaskName)).getText().toString();
             String description = ((EditText)findViewById(R.id.edtDescription)).getText().toString();
             String handlingContent = ((EditText)findViewById(R.id.edtHandlingContent)).getText().toString();
-            String source = selectedSource;
             String status = selectedStatus;
             String confirm = "Not Confirmed";
             String txtTimeBegin = ((TextView)findViewById(R.id.txtTimeBegin)).getText().toString();
@@ -200,7 +136,7 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             Timestamp dateFinish = changeStringToTime(txtTimeFinish);
             String txtTimeCreated = getTimeCreated();
             Timestamp dateCreated = changeStringToTime(txtTimeCreated);
-            String creator = ((EditText)findViewById(R.id.edtCreator)).getText().toString();
+            String creator = username;
             String taskHandler = ((EditText)findViewById(R.id.edtTaskHandler)).getText().toString();
 
             String test = "image.png";
@@ -210,7 +146,7 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
 
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, source, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
+            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
             System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
             if (infoDAO.createNewTask(infoDTO, userRole)){
                 int id = infoDAO.getNewTaskId();

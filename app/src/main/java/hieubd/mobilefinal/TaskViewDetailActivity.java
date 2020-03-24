@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +52,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         filterRoleForTask();
         createSpinnerStatus();
         createSpinnerConfirmation();
-        createSpinnerSource();
         autoFillAllDetails();
         managerMarkValidate();
     }
@@ -85,6 +85,10 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             Spinner spnConfirm = findViewById(R.id.spnEditConfirmation);
             spnConfirm.setEnabled(false);
         }
+        if (userRole == Role.Admin && managerIsViewingHisEdit){
+            LinearLayout managerLayout = findViewById(R.id.managerLayout);
+            managerLayout.setVisibility(View.GONE);
+        }
     }
 
     private void autoFillAllDetails(){
@@ -98,7 +102,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         TextView txtTimeCreated = findViewById(R.id.txtEditTimeCreated);
         Spinner spnStatus = findViewById(R.id.spnEditStatus);
         Spinner spnConfirm = findViewById(R.id.spnEditConfirmation);
-        Spinner spnSource = findViewById(R.id.spnEditSource);
         EditText edtComment = findViewById(R.id.edtEditComment);
         EditText edtMark = findViewById(R.id.edtEditMark);
         TextView txtTimeComment = findViewById(R.id.txtEditTimeComment);
@@ -122,16 +125,12 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         txtTimeCreated.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeCreated()));
         spnStatus.setOnItemSelectedListener(null);
         spnConfirm.setOnItemSelectedListener(null);
-        spnSource.setOnItemSelectedListener(null);
         setSelectedProgrammatically = 0;
         spnStatus.setSelection(getIndexOfValueFromSpinner(spnStatus, infoDTO.getStatus()));
         spnConfirm.setSelection(getIndexOfValueFromSpinner(spnConfirm, infoDTO.getConfirmation()));
-        spnSource.setSelection(getIndexOfValueFromSpinner(spnSource, infoDTO.getSource()));
-        oldSource = spnSource.getSelectedItem().toString();
         setSelectedProgrammatically = 1;
         spnStatus.setOnItemSelectedListener(spnStatusListener);
         spnConfirm.setOnItemSelectedListener(spnConfirmListener);
-        spnSource.setOnItemSelectedListener(spnSourceListener);
         if (managerDTO != null){
             edtComment.setText(managerDTO.getManagerComment());
             edtMark.setText(managerDTO.getManagerMark());
@@ -247,21 +246,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         }
     };
 
-    private Spinner.OnItemSelectedListener spnSourceListener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            selectedSource = adapterView.getItemAtPosition(i).toString();
-            if (setSelectedProgrammatically == 1){
-                operateSource();
-            }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-
-        }
-    };
-
     private void createSpinnerStatus(){
         Spinner spnStatus = findViewById(R.id.spnEditStatus);
         List<String> statuses = new ArrayList<>();
@@ -284,71 +268,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, confirms);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnConfirm.setAdapter(adapter);
-    }
-
-    private void createSpinnerSource(){
-        Spinner spnSource = findViewById(R.id.spnEditSource);
-        PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
-        List<String> adapterSource = new ArrayList<>();
-        adapterSource.add("New");
-        if (infoDAO.getAllTaskIdAndNameByTaskHandlerExcludeTaskID(username, thisTaskId) != null){
-            adapterSource.addAll(infoDAO.getAllTaskIdAndNameByTaskHandlerExcludeTaskID(username, thisTaskId));
-        }
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, adapterSource);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnSource.setAdapter(adapter);
-    }
-
-    private void operateSource(){
-        if (!selectedSource.equalsIgnoreCase("new")){
-            if (setSelectedProgrammatically == 1){
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("Confirmation");
-                alertDialog.setIcon(R.mipmap.ic_launcher_round);
-                alertDialog.setMessage("You about to change the source. Proceed?");
-                alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        String[] selectedSourcePart =  selectedSource.split(" - ");
-                        String id = selectedSourcePart[0];
-                        PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
-                        PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-                        PersonalTaskInfoDTO infoDTO = infoDAO.getTaskById(Integer.parseInt(id));
-                        PersonalTaskTimeDTO timeDTO = timeDAO.getTaskById(Integer.parseInt(id));
-
-                        EditText edtEditDesc = findViewById(R.id.edtEditDescription);
-                        EditText edtEditHandlingContent = findViewById(R.id.edtEditHandlingContent);
-                        EditText edtEditCreator = findViewById(R.id.edtEditCreator);
-                        EditText edtEditHandler = findViewById(R.id.edtEditTaskHandler);
-                        TextView txtTimeBegin = findViewById(R.id.txtEditTimeBegin);
-                        TextView txtTimeFinish = findViewById(R.id.txtEditTimeFinish);
-                        Spinner spnStatus = findViewById(R.id.spnEditStatus);
-
-                        edtEditDesc.setText(infoDTO.getDescription());
-                        edtEditHandlingContent.setText(infoDTO.getHandlingContent());
-                        edtEditCreator.setText(infoDTO.getCreator());
-                        edtEditHandler.setText(infoDTO.getTaskHandler());
-                        txtTimeBegin.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeBegin()));
-                        txtTimeFinish.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeFinish()));
-                        setSelectedProgrammatically = 0;
-                        spnStatus.setSelection(getIndexOfValueFromSpinner(spnStatus, infoDTO.getStatus()));
-                        setSelectedProgrammatically = 1;
-                    }
-                });
-
-                alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Spinner spnSource = findViewById(R.id.spnEditSource);
-                        setSelectedProgrammatically = 0;
-                        spnSource.setSelection(getIndexOfValueFromSpinner(spnSource, oldSource));
-                        selectedSource = oldSource;
-                        setSelectedProgrammatically = 1;
-                    }
-                });
-                alertDialog.show();
-            }
-        }
     }
 
     private void submitEdit(){
@@ -385,7 +304,7 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
             PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
-            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, null, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
+            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
             infoDTO.setId(thisTaskId);
             System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
             if (infoDAO.updateTask(infoDTO)){
