@@ -16,6 +16,11 @@ public class GroupDTO implements Serializable {
         this.managerId = managerId;
     }
 
+    public GroupDTO(String name, int managerId) {
+        this.name = name;
+        this.managerId = managerId;
+    }
+
     public int getId() {
         return id;
     }

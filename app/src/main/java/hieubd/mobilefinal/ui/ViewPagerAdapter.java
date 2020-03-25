@@ -6,19 +6,20 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
+import hieubd.dto.GroupDTO;
 import hieubd.mobilefinal.GroupInfoFragment;
 import hieubd.mobilefinal.MemberFragment;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     private Context myContext;
     int totalTabs;
-    private String name;
+    private GroupDTO dto;
 
-    public ViewPagerAdapter(Context context, FragmentManager fm, int totalTabs, String name) {
+    public ViewPagerAdapter(Context context, FragmentManager fm, int totalTabs, GroupDTO dto) {
         super(fm);
         myContext = context;
         this.totalTabs = totalTabs;
-        this.name = name;
+        this.dto = dto;
     }
 
     // this is for fragment tabs
@@ -26,10 +27,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                GroupInfoFragment groupInfoFragment = new GroupInfoFragment(name);
+                GroupInfoFragment groupInfoFragment = new GroupInfoFragment(dto);
                 return groupInfoFragment;
             case 1:
-                MemberFragment memberFragment = new MemberFragment();
+                MemberFragment memberFragment = new MemberFragment(dto);
                 return memberFragment;
             default:
                 return null;

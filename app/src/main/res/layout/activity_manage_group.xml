@@ -30,6 +30,7 @@
         android:gravity="center"
         android:orientation="horizontal">
         <Button
+            android:onClick="onClickNewGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="New Group"/>

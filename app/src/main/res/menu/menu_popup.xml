@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Add Manager"
+        android:id="@+id/miAddManager"
+        />
+    <item android:title="Add User"
+        android:id="@+id/miAddUser"
+        />
+</menu>

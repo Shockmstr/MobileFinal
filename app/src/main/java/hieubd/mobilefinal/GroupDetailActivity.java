@@ -8,13 +8,14 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 
+import hieubd.dto.GroupDTO;
 import hieubd.mobilefinal.ui.ViewPagerAdapter;
 
 public class GroupDetailActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private String name;
+    private GroupDTO groupDTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +24,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabsGroup);
         viewPager = findViewById(R.id.viewPager);
         Intent intent = this.getIntent();
-        name = intent.getStringExtra("NAME");
+        groupDTO = (GroupDTO) intent.getSerializableExtra("DTO");
         setUpViewPager();
         //tabLayout.setupWithViewPager(viewPager);
         setIcon();
@@ -34,7 +35,7 @@ public class GroupDetailActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText("Members"));
         //tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final ViewPagerAdapter adapter = new ViewPagerAdapter(this,getSupportFragmentManager(), tabLayout.getTabCount(), name);
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(this,getSupportFragmentManager(), tabLayout.getTabCount(), groupDTO);
         viewPager.setAdapter(adapter);
 
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -58,7 +59,9 @@ public class GroupDetailActivity extends AppCompatActivity {
 }
 
     private void setIcon(){
-        tabLayout.getTabAt(0).setIcon(R.mipmap.ic_launcher);
-        tabLayout.getTabAt(1).setIcon(R.mipmap.ic_launcher);
+        tabLayout.getTabAt(0).setIcon(R.drawable.info); // Info
+        tabLayout.getTabAt(1).setIcon(R.drawable.account); // member
     }
+
+
 }

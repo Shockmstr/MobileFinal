@@ -3,32 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     tools:context=".MemberFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="- Manager -"
-        android:textAllCaps="true"
-        android:textSize="30sp"
-        android:gravity="center"/>
 
-    <ListView
-        android:id="@+id/listManagerFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <TextView
-        android:layout_width="match_parent"
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="- Manager -"
+            android:textAllCaps="true"
+            android:textSize="30sp"
+            android:gravity="center"/>
+
+        <ListView
+            android:id="@+id/listManagerFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="- Users -"
+            android:textAllCaps="true"
+            android:textSize="30sp"
+            android:gravity="center"/>
+        <GridView
+            android:id="@+id/gridUserFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="2"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:onClick="onClickAddUserToGroup"
+        android:id="@+id/fabAdd"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="- Users -"
-        android:textAllCaps="true"
-        android:textSize="30sp"
-        android:gravity="center"/>
-    <GridView
-        android:id="@+id/gridUserFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:numColumns="2"/>
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/add_plus"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:contentDescription="Add"
+        app:fabSize="auto"
+        android:layout_margin="16sp"/>
 </LinearLayout>
