@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:text="Status"
+                android:textStyle="bold"
                 android:textSize="17sp"
                 android:id="@+id/txtItemStatus"/>
         </LinearLayout>

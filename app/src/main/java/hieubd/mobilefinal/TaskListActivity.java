@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +32,7 @@ public class TaskListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_task_list);
         Intent intent = this.getIntent();
         username = intent.getStringExtra("USERNAME");
+        taskListView = findViewById(R.id.listTask);
         createListView();
     }
 
@@ -40,7 +42,9 @@ public class TaskListActivity extends AppCompatActivity {
         infoDTOList = infoDAO.getAllTasksHandlerByUsername(username);
         timeDTOList = timeDAO.getMultipleTaskById(infoDTOList);
         taskAdapter = new TaskAdapter(infoDTOList, timeDTOList);
-        taskListView = findViewById(R.id.listTask);
+        TextView v = new TextView(this);
+        v.setText("Your Tasks");
+        taskListView.addHeaderView(v);
         taskListView.setAdapter(taskAdapter);
         taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

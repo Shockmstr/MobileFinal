@@ -5,12 +5,15 @@ import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -19,6 +22,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -38,11 +43,11 @@ import hieubd.jdbc.JDBCUtils;
 
 public class TaskViewDetailActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener{
     private int getDateNumberFlag = -1;
-    private int setSelectedProgrammatically = 0;
-    private String selectedStatus, selectedConfirm, selectedSource, oldSource;
+    private String selectedStatus, selectedConfirm;
     private int thisTaskId;
     private Role userRole;
     private String username;
+    private PersonalTaskInfoDTO infoDTO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,32 +63,32 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
 
     private void getInfoFromIntent(){
         Intent intent = this.getIntent();
-        PersonalTaskInfoDTO infoDTO = (PersonalTaskInfoDTO) intent.getSerializableExtra("DTO");
+        infoDTO = (PersonalTaskInfoDTO) intent.getSerializableExtra("DTO");
         username = infoDTO.getTaskHandler();
         thisTaskId = infoDTO.getId();
+        userRole = (Role) intent.getSerializableExtra("ROLE");
     }
 
     private void filterRoleForTask(){
         Intent intent = this.getIntent();
-        userRole = (Role) intent.getSerializableExtra("ROLE");
         boolean managerIsViewingHisEdit = intent.getBooleanExtra("MANAGERFLAG", false);
         if (userRole == Role.User){
             //LinearLayout managerLayout = findViewById(R.id.managerLayout);
             //managerLayout.setVisibility(View.GONE);
-            EditText edtEditComment = findViewById(R.id.edtEditComment);
+            TextInputEditText edtEditComment = findViewById(R.id.edtEditComment);
             edtEditComment.setEnabled(false);
             EditText edtEditMark = findViewById(R.id.edtEditMark);
             edtEditMark.setEnabled(false);
-            Spinner spnConfirm = findViewById(R.id.spnEditConfirmation);
-            spnConfirm.setEnabled(false);
+            Button btnConfirm = findViewById(R.id.btnConfirm);
+            btnConfirm.setEnabled(false);
         }
         if (managerIsViewingHisEdit == true){
-            EditText edtEditComment = findViewById(R.id.edtEditComment);
+            TextInputEditText edtEditComment = findViewById(R.id.edtEditComment);
             edtEditComment.setEnabled(false);
             EditText edtEditMark = findViewById(R.id.edtEditMark);
             edtEditMark.setEnabled(false);
-            Spinner spnConfirm = findViewById(R.id.spnEditConfirmation);
-            spnConfirm.setEnabled(false);
+            Button btnConfirm = findViewById(R.id.btnConfirm);
+            btnConfirm.setEnabled(false);
         }
         if (userRole == Role.Admin && managerIsViewingHisEdit){
             LinearLayout managerLayout = findViewById(R.id.managerLayout);
@@ -92,24 +97,23 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
     }
 
     private void autoFillAllDetails(){
-        EditText edtEditName = findViewById(R.id.edtEditTaskName);
-        EditText edtEditDesc = findViewById(R.id.edtEditDescription);
-        EditText edtEditHandlingContent = findViewById(R.id.edtEditHandlingContent);
-        EditText edtEditCreator = findViewById(R.id.edtEditCreator);
-        EditText edtEditHandler = findViewById(R.id.edtEditTaskHandler);
+        TextInputEditText edtEditName = findViewById(R.id.edtEditTaskName);
+        TextInputEditText edtEditDesc = findViewById(R.id.edtEditDescription);
+        TextInputEditText edtEditHandlingContent = findViewById(R.id.edtEditHandlingContent);
+        TextInputEditText edtEditCreator = findViewById(R.id.edtEditCreator);
+        TextInputEditText edtEditHandler = findViewById(R.id.edtEditTaskHandler);
         TextView txtTimeBegin = findViewById(R.id.txtEditTimeBegin);
         TextView txtTimeFinish = findViewById(R.id.txtEditTimeFinish);
         TextView txtTimeCreated = findViewById(R.id.txtEditTimeCreated);
         Spinner spnStatus = findViewById(R.id.spnEditStatus);
-        Spinner spnConfirm = findViewById(R.id.spnEditConfirmation);
-        EditText edtComment = findViewById(R.id.edtEditComment);
+        Button btnConfirm = findViewById(R.id.btnConfirm);
+        TextInputEditText edtComment = findViewById(R.id.edtEditComment);
         EditText edtMark = findViewById(R.id.edtEditMark);
         TextView txtTimeComment = findViewById(R.id.txtEditTimeComment);
 
-        Intent intent = this.getIntent();
         PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
         PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
-        PersonalTaskInfoDTO infoDTO = (PersonalTaskInfoDTO) intent.getSerializableExtra("DTO");
+        //PersonalTaskInfoDTO infoDTO = (PersonalTaskInfoDTO) intent.getSerializableExtra("DTO");
 
         PersonalTaskTimeDTO timeDTO = timeDAO.getTaskById(thisTaskId);
         PersonalTaskManagerDTO managerDTO = managerDAO.getTaskById(thisTaskId);
@@ -123,20 +127,33 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         txtTimeBegin.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeBegin()));
         txtTimeFinish.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeFinish()));
         txtTimeCreated.setText(JDBCUtils.fromTimestampToString(timeDTO.getTimeCreated()));
+        btnConfirm.setText(infoDTO.getConfirmation());
+        formatBtnConfirm(btnConfirm);
         spnStatus.setOnItemSelectedListener(null);
-        spnConfirm.setOnItemSelectedListener(null);
-        setSelectedProgrammatically = 0;
         spnStatus.setSelection(getIndexOfValueFromSpinner(spnStatus, infoDTO.getStatus()));
-        spnConfirm.setSelection(getIndexOfValueFromSpinner(spnConfirm, infoDTO.getConfirmation()));
-        setSelectedProgrammatically = 1;
         spnStatus.setOnItemSelectedListener(spnStatusListener);
-        spnConfirm.setOnItemSelectedListener(spnConfirmListener);
         if (managerDTO != null){
             edtComment.setText(managerDTO.getManagerComment());
             edtMark.setText(managerDTO.getManagerMark());
             txtTimeComment.setText(JDBCUtils.fromTimestampToString(managerDTO.getManagerCommentBeginTime()));
         }else{
             txtTimeComment.setText(getCurrentDate());
+        }
+    }
+
+    private void formatBtnConfirm(Button btnConfirm){
+        String confirm = btnConfirm.getText().toString();
+        switch (confirm){
+            case "Waiting":
+                break;
+            case "Accepted":
+                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN);
+                btnConfirm.setTextColor(Color.WHITE);
+                break;
+            case "Denied":
+                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.RED);
+                btnConfirm.setTextColor(Color.WHITE);
+                break;
         }
     }
 
@@ -276,7 +293,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             String name = ((EditText)findViewById(R.id.edtEditTaskName)).getText().toString();
             String description = ((EditText)findViewById(R.id.edtEditDescription)).getText().toString();
             String handlingContent = ((EditText)findViewById(R.id.edtEditHandlingContent)).getText().toString();
-            String source = selectedSource;
             String status = selectedStatus;
             String confirm = selectedConfirm;
             String txtTimeBegin = ((TextView)findViewById(R.id.txtEditTimeBegin)).getText().toString();
@@ -306,10 +322,10 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
             PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
             infoDTO.setId(thisTaskId);
-            System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
+            //System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
             if (infoDAO.updateTask(infoDTO)){
                 PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(thisTaskId, dateBegin, dateFinish, dateCreated);
-                System.out.println(thisTaskId + dateBegin.toString() + dateFinish.toString() + dateCreated.toString());
+                //System.out.println(thisTaskId + dateBegin.toString() + dateFinish.toString() + dateCreated.toString());
                 PersonalTaskManagerDTO managerDTO = new PersonalTaskManagerDTO(thisTaskId, comment, Integer.parseInt(mark), dateComment);
                 if (timeDAO.updateTask(timeDTO));
                 else error += "\nCannot update task! Please check the date inputs again.";

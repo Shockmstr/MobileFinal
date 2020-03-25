@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import hieubd.dao.UserDAO;
@@ -13,6 +14,7 @@ import hieubd.dto.Role;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText edtUsername, edtPassword;
+    private final int REQ_LOGIN_CODE = 5050;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,17 +34,17 @@ public class LoginActivity extends AppCompatActivity {
                 case User:
                     Intent intent = new Intent(this, UserActivity.class);
                     intent.putExtra("USERNAME", edtUsername.getText().toString());
-                    startActivity(intent);
+                    startActivityForResult(intent, REQ_LOGIN_CODE);
                     break;
                 case Manager:
                     Intent intent2 = new Intent(this, ManagerActivity.class);
                     intent2.putExtra("USERNAME", edtUsername.getText().toString());
-                    startActivity(intent2);
+                    startActivityForResult(intent2, REQ_LOGIN_CODE);
                     break;
                 case Admin:
                     Intent intent3 = new Intent(this, AdminActivity.class);
                     intent3.putExtra("USERNAME", edtUsername.getText().toString());
-                    startActivity(intent3);
+                    startActivityForResult(intent3, REQ_LOGIN_CODE);
                     break;
                 default:
                     break;
@@ -52,4 +54,13 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQ_LOGIN_CODE){
+            if (resultCode == RESULT_OK){
+                // Do nothing
+            }
+        }
+    }
 }

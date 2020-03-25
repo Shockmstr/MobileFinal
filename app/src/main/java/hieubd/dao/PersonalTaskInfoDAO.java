@@ -388,4 +388,118 @@ public class PersonalTaskInfoDAO {
         }
         return result;
     }
+
+    public boolean deleteAllTaskByCreatorOrHandler(String creator){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Delete from PersonalTaskInfo where Creator=?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, creator);
+                result = stm.executeUpdate() > 0;
+                sql = "Update PersonalTaskInfo set TaskHandler=NULL where TaskHandler=?";
+                stm = conn.prepareStatement(sql);
+                //stm.setNull(1, Types.NVARCHAR);
+                stm.setString(1, creator);
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public boolean updateAllTaskByCreatorOrHandlerBefore(String creator, List<Integer> taskIdList){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "update PersonalTaskInfo set Creator = NULL where TaskID = ? AND (Creator=?)\n";
+                sql += "update PersonalTaskInfo set TaskHandler = NULL where TaskID = ? AND (TaskHandler=?)\n";
+                stm = conn.prepareStatement(sql);
+                //stm.setNull(1, Types.NVARCHAR);
+                for (Integer id:
+                     taskIdList) {
+                    stm.setInt(1, id);
+                    stm.setString(2, creator);
+                    //stm.setNull(4, Types.NVARCHAR);
+                    stm.setInt(3, id);
+                    stm.setString(4, creator);
+                    result = stm.executeUpdate() > 0;
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public boolean updateAllTaskByCreatorOrHandlerAfter(String creator, List<Integer> taskIdList){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "update PersonalTaskInfo set Creator = ? where TaskID = ? AND (Creator IS NULL)\n";
+                sql += "update PersonalTaskInfo set TaskHandler = ? where TaskID = ? AND (TaskHandler IS NULL)\n";
+                stm = conn.prepareStatement(sql);
+                for (Integer id: taskIdList)
+                {
+                    stm.setInt(2, id);
+                    stm.setString(1, creator);
+                    stm.setInt(4, id);
+                    stm.setString(3, creator);
+                    result = stm.executeUpdate() > 0;
+                }
+
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public List<Integer> getAllTaskIDByCreatorOrHandler(String creator){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<Integer> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select TaskID from PersonalTaskInfo where TaskHandler=? OR Creator=?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, creator);
+                stm.setString(2, creator);
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("TaskID");
+                    result.add(id);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
 }

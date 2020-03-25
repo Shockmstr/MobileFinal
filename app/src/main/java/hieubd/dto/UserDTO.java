@@ -8,26 +8,23 @@ public class UserDTO implements Serializable {
     private String password;
     private String fullName;
     private Role role;
-    private int managerId;
 
     public UserDTO() {
     }
 
-    public UserDTO(int id, String username, String password, String fullName, Role role, int managerId) {
+    public UserDTO(int id, String username, String password, String fullName, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.fullName = fullName;
         this.role = role;
-        this.managerId = managerId;
     }
 
-    public UserDTO(String username, String password, String fullName, Role role, int managerId) {
+    public UserDTO(String username, String password, String fullName, Role role) {
         this.username = username;
         this.password = password;
         this.fullName = fullName;
         this.role = role;
-        this.managerId = managerId;
     }
 
     public int getId() {
@@ -53,15 +50,6 @@ public class UserDTO implements Serializable {
     public Role getRole() {
         return role;
     }
-
-    public int getManagerId() {
-        return managerId;
-    }
-
-    public void setManagerId(int managerId) {
-        this.managerId = managerId;
-    }
-
     public String getUsername() {
         return username;
     }

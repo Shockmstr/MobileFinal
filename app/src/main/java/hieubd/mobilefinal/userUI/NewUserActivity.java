@@ -6,12 +6,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,32 +23,38 @@ import hieubd.dto.UserDTO;
 import hieubd.mobilefinal.R;
 
 public class NewUserActivity extends AppCompatActivity {
-    private String selectedManagerUsername, selectedRole;
+    private String selectedRole;
+    private TextInputLayout til;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_user);
+        til = findViewById(R.id.tilUsername);
         createSpinnerRole();
         createFocusListenerForUsername();
     }
 
     public void onClickCreateNewUser(View view) {
-        EditText edtNewUsername = findViewById(R.id.edtNewUsername);
-        EditText edtNewPassword = findViewById(R.id.edtNewPassword);
-        EditText edtNewFullname = findViewById(R.id.edtNewFullname);
-        TextView edtErrorUsername = findViewById(R.id.txtErrorUsername);
-        UserDAO userDAO = new UserDAO();
-        UserDTO managerDTO = userDAO.getUserByUsername(selectedManagerUsername);
+        String error = "";
+        TextInputEditText edtNewUsername = findViewById(R.id.edtNewUsername);
+        TextInputEditText edtNewPassword = findViewById(R.id.edtNewPassword);
+        TextInputEditText edtNewFullname = findViewById(R.id.edtNewFullname);
 
-        if (edtErrorUsername.getVisibility() == View.GONE){
+       // TextView edtErrorUsername = findViewById(R.id.txtErrorUsername);
+        UserDAO userDAO = new UserDAO();
+        //validate
+        if (edtNewUsername.getText().toString().isEmpty())error += "Username is empty\n";
+        if (edtNewPassword.getText().toString().isEmpty())error += "Password is empty\n";
+        if (edtNewFullname.getText().toString().isEmpty())error += "Fullname is empty\n";
+
+        if (/*edtErrorUsername.getVisibility() == View.GONE &&*/ error.equals("")){
             String username = edtNewUsername.getText().toString();
             String password = edtNewPassword.getText().toString();
             String fullname = edtNewFullname.getText().toString();
             Role role = Role.valueOf(selectedRole);
-            int managerId = managerDTO.getId();
 
-            UserDTO newUserDto = new UserDTO(username, password, fullname, role, managerId);
+            UserDTO newUserDto = new UserDTO(username, password, fullname, role);
             try {
                 if (userDAO.createNewUser(newUserDto)){
                     Toast.makeText(getBaseContext(), "New user created", Toast.LENGTH_SHORT).show();
@@ -61,7 +68,7 @@ public class NewUserActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }else{
-            Toast.makeText(this, "Error creating new user", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error creating new user\n" + error, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -72,7 +79,7 @@ public class NewUserActivity extends AppCompatActivity {
     }
 
     private void createFocusListenerForUsername(){
-        EditText edtUsername = findViewById(R.id.edtNewUsername);
+        TextInputEditText edtUsername = findViewById(R.id.edtNewUsername);
         edtUsername.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
@@ -80,11 +87,13 @@ public class NewUserActivity extends AppCompatActivity {
                     String username = ((EditText)view).getText().toString();
                     UserDAO userDAO = new UserDAO();
                     if (userDAO.checkUsernameIsExisted(username)){
-                        TextView txtErrorUsername = findViewById(R.id.txtErrorUsername);
-                        txtErrorUsername.setVisibility(View.VISIBLE);
+                        /*TextView txtErrorUsername = findViewById(R.id.txtErrorUsername);
+                        txtErrorUsername.setVisibility(View.VISIBLE);*/
+                        til.setError("Username is already existed");
                     }else{
-                        TextView txtErrorUsername = findViewById(R.id.txtErrorUsername);
-                        txtErrorUsername.setVisibility(View.GONE);
+                        /*TextView txtErrorUsername = findViewById(R.id.txtErrorUsername);
+                        txtErrorUsername.setVisibility(View.GONE);*/
+                        til.setError(null);
                     }
                 }
             }
@@ -103,13 +112,6 @@ public class NewUserActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedRole = adapterView.getItemAtPosition(i).toString();
-                if (selectedRole == "Manager"){
-                    LinearLayout groupLayout = findViewById(R.id.groupLayout);
-                    groupLayout.setVisibility(View.GONE);
-                }else{
-                    LinearLayout groupLayout = findViewById(R.id.groupLayout);
-                    groupLayout.setVisibility(View.VISIBLE);
-                }
             }
 
             @Override

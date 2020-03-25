@@ -58,4 +58,9 @@ public class UserActivity extends AppCompatActivity {
         intent.putExtra("USERNAME", username);
         startActivity(intent);
     }
+
+    public void logout(View view) {
+        this.setResult(RESULT_OK);
+        finish();
+    }
 }

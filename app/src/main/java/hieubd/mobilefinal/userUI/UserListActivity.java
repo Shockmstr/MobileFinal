@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -52,6 +53,25 @@ public class UserListActivity extends AppCompatActivity {
             });
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_EDIT_CODE){
+            if (resultCode == RESULT_OK){
+                UserDAO userDAO = new UserDAO();
+                List<UserDTO> tmp1 = userDAO.getAllUserByRole(Role.User);
+                List<UserDTO> tmp2 = userDAO.getAllUserByRole(Role.Manager);
+                userDTOList.clear();
+                userDTOList.addAll(tmp1);
+                userDTOList.addAll(tmp2);
+                userAdapter.setUserDTOList(userDTOList);
+                gridView.setAdapter(userAdapter);
+            }else if (resultCode == RESULT_CANCELED){
+                // do nothing
+            }
         }
     }
 }

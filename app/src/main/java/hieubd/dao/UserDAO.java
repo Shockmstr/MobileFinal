@@ -16,6 +16,16 @@ public class UserDAO {
     public UserDAO() {
     }
 
+    private void closeConnection(Connection conn, PreparedStatement stm, ResultSet rs){
+        try{
+            if (rs != null) rs.close();
+            if (stm != null) stm.close();
+            if (conn != null) conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Role checkLogin(String username, String password){
         Role role = Role.None;
         Connection conn = null;
@@ -130,7 +140,7 @@ public class UserDAO {
         try{
             conn = JDBCUtils.getMyConnection();
             if (conn != null){
-                String sql = "select UserID, Username, FullName, Password, ManagerID from UserInfo where Role = ?";
+                String sql = "select UserID, Username, FullName, Password from UserInfo where Role = ?";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, role.toString());
                 rs = stm.executeQuery();
@@ -140,8 +150,7 @@ public class UserDAO {
                     String username = rs.getString("Username");
                     String password = rs.getString("Password");
                     String fullName = rs.getString("FullName");
-                    int managerId = rs.getInt("ManagerID");
-                    UserDTO dto = new UserDTO(id, username, password, fullName, role, managerId);
+                    UserDTO dto = new UserDTO(id, username, password, fullName, role);
                     result.add(dto);
                 }
             }
@@ -229,13 +238,12 @@ public class UserDAO {
         try {
             conn = JDBCUtils.getMyConnection();
             if (conn != null){
-                String sql = "Insert into UserInfo values(?,?,?,?,?)";
+                String sql = "Insert into UserInfo values(?,?,?,?)";
                 stm = conn.prepareStatement(sql);
                 stm.setString(1, dto.getUsername());
                 stm.setString(2, dto.getPassword());
                 stm.setString(3, dto.getFullName());
                 stm.setString(4, dto.getRole().toString());
-                stm.setInt(5, dto.getManagerId());
                 result = stm.executeUpdate() > 0;
             }
         }catch (SQLException e) {
@@ -248,6 +256,52 @@ public class UserDAO {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
+        return result;
+    }
+
+    public boolean updateUser(UserDTO dto){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Update UserInfo set Username=?, Password=?, Fullname=?, Role=? where UserID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, dto.getUsername());
+                stm.setString(2, dto.getPassword());
+                stm.setString(3, dto.getFullName());
+                stm.setString(4, dto.getRole().toString());
+                stm.setInt(5, dto.getId());
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public boolean deleteUser(int id){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Delete from UserInfo where UserID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, id);
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
         }
         return result;
     }
