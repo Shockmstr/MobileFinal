@@ -1,6 +1,7 @@
 package hieubd.mobilefinal;
 
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -58,6 +59,7 @@ public class GroupInfoFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         GroupDAO groupDAO = new GroupDAO();
+                        updateTheDto();
                         dto.setName(input.getText().toString());
                         if (groupDAO.updateGroup(dto)){
                             Toast.makeText(view.getContext(), "Name changed", Toast.LENGTH_SHORT).show();
@@ -93,8 +95,9 @@ public class GroupInfoFragment extends Fragment {
                         GroupDAO groupDAO = new GroupDAO();
                         if (groupDAO.deleteGroup(dto.getId())){
                             Toast.makeText(view.getContext(), "Group deleted", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getContext(), ManageGroupActivity.class);
-
+                            Intent intent = getActivity().getIntent();
+                            getActivity().setResult(Activity.RESULT_OK, intent);
+                            getActivity().finish();
                         }else{
                             Toast.makeText(view.getContext(), "Failed to delete!", Toast.LENGTH_SHORT).show();
                         }
@@ -130,5 +133,10 @@ public class GroupInfoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    private void updateTheDto(){
+        GroupDAO dao = new GroupDAO();
+        dto = dao.getGroupById(dto.getId());
     }
 }

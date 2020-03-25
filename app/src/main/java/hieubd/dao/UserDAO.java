@@ -55,14 +55,16 @@ public class UserDAO {
         try{
             conn = JDBCUtils.getMyConnection();
             if (conn != null){
-                String sql = "select FullName, Role from UserInfo where UserID = ?";
+                String sql = "select Username, FullName, Role from UserInfo where UserID = ?";
                 stm = conn.prepareStatement(sql);
                 stm.setInt(1, id);
                 rs = stm.executeQuery();
                 if (rs.next()){
+                    String username = rs.getString("Username");
                     String fullName = rs.getString("FullName");
                     String role = rs.getString("Role");
                     UserDTO dto = new UserDTO();
+                    dto.setUsername(username);
                     dto.setFullName(fullName);
                     dto.setRole(Role.valueOf(role));
                     dto.setId(id);
@@ -140,6 +142,39 @@ public class UserDAO {
                     String fullName = rs.getString("FullName");
                     int managerId = rs.getInt("ManagerID");
                     UserDTO dto = new UserDTO(id, username, password, fullName, role, managerId);
+                    result.add(dto);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try{
+                if (rs != null) rs.close();
+                if (stm != null) stm.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public List<UserDTO> getAllUserByGroupID(int groupId){
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<UserDTO> result =  null;
+        try{
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "select UserID from GroupUser where GroupID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, groupId);
+                rs = stm.executeQuery();
+                while (rs.next()){
+                    if (result == null) result  = new ArrayList<>();
+                    int id = rs.getInt("UserID");
+                    UserDTO dto = this.getUserById(id);
                     result.add(dto);
                 }
             }

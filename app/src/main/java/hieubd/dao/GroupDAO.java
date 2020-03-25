@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hieubd.dto.GroupDTO;
+import hieubd.dto.UserDTO;
 import hieubd.jdbc.JDBCUtils;
 
 public class GroupDAO {
@@ -47,6 +48,28 @@ public class GroupDAO {
         return result;
     }
 
+    public boolean createUserInGroup(GroupDTO dto, UserDTO userDTO){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Insert into GroupUser values(?,?)";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, dto.getId());
+                stm.setInt(2, userDTO.getId());
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
     public List<GroupDTO> getAllGroup(){
         Connection conn = null;
         PreparedStatement stm = null;
@@ -75,6 +98,32 @@ public class GroupDAO {
             closeConnection(conn, stm, rs);
         }
         return result;
+    }
+
+    public GroupDTO getGroupById(int id){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        GroupDTO dto = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select GroupName, ManagerID from GroupInfo where GroupID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, id);
+                rs = stm.executeQuery();
+                if(rs.next()){
+                    String name = rs.getString("GroupName");
+                    int managerId = rs.getInt("ManagerID");
+                    dto = new GroupDTO(id, name, managerId);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return dto;
     }
 
     public boolean updateGroup(GroupDTO dto){
@@ -121,6 +170,49 @@ public class GroupDAO {
         return result;
     }
 
+    public boolean deleteManagerFromGroup(GroupDTO dto){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Update GroupInfo set ManagerID=? where GroupID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, -1);
+                stm.setInt(2, dto.getId());
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public boolean deleteUserFromGroup(int userId){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Delete from GroupUser where UserID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, userId);
+                result = stm.executeUpdate() > 0;
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
     public boolean isManagerExistedInGroup(GroupDTO dto){
         Connection conn = null;
         PreparedStatement stm = null;
@@ -149,4 +241,33 @@ public class GroupDAO {
         }
         return result;
     }
+
+    public boolean isUserExistedInGroup(GroupDTO dto, int userId){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        boolean result = false;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select UserID from GroupUser where GroupID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, dto.getId());
+                rs = stm.executeQuery();
+                if (rs.next()){
+                    int idUser = rs.getInt("UserID");
+                    if (userId == idUser){
+                        result = true;
+                    }
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+
 }

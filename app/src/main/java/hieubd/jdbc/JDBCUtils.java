@@ -20,7 +20,7 @@ public class JDBCUtils {
         Connection conn = null;
         String url = null;
         //String serverName = "10.0.2.2"; //Emulator
-        JDBCObject jdbcObject = new JDBCObject("192.168.1.106", "sa", "1234",
+        JDBCObject jdbcObject = new JDBCObject("192.168.1.105", "sa", "1234",
                 "MobileProject", "1111");
         try {
             Class.forName(jdbcObject.getsClass());
