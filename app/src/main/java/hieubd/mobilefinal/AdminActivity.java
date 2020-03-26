@@ -82,4 +82,9 @@ public class AdminActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ManageGroupActivity.class);
         startActivity(intent);
     }
+
+    public void logout(View view) {
+        this.setResult(RESULT_OK);
+        finish();
+    }
 }

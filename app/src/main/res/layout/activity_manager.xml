@@ -7,10 +7,16 @@
     android:orientation="vertical"
     tools:context=".ManagerActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="86sp"
-        android:text="Welcome Back, "
+        android:text="Manager: "
         android:textSize="30sp"
         android:textStyle="bold"
         android:gravity="center"
@@ -32,6 +38,19 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View/ Comment User Task"
-        android:onClick="onClickViewUserTask"/>
+        android:text="View/ Comment Group Task"
+        android:onClick="onClickViewGroupTask"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan QR Code"
+        android:onClick="onClickScanQR"/>
+    </LinearLayout>
+    <Button
+        android:onClick="logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Logout"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:textColor="@android:color/white"/>
 </LinearLayout>

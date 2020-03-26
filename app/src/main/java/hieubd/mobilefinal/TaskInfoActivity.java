@@ -17,8 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +29,7 @@ import hieubd.dao.PersonalTaskTimeDAO;
 import hieubd.dto.PersonalTaskInfoDTO;
 import hieubd.dto.PersonalTaskTimeDTO;
 import hieubd.dto.Role;
+import hieubd.jdbc.JDBCUtils;
 
 public class TaskInfoActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
@@ -38,7 +37,6 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
     private String selectedStatus;
     private Role userRole;
     private String username;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,7 +131,7 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             String description = ((TextInputEditText)findViewById(R.id.edtDescription)).getText().toString();
             String handlingContent = ((TextInputEditText)findViewById(R.id.edtHandlingContent)).getText().toString();
             String status = selectedStatus;
-            String confirm = "Waiting";
+            String confirm = "Not Confirmed";
             String txtTimeBegin = ((TextView)findViewById(R.id.txtTimeBegin)).getText().toString();
             Timestamp dateBegin = changeStringToTime(txtTimeBegin);
             String txtTimeFinish = ((TextView)findViewById(R.id.txtTimeFinish)).getText().toString();
@@ -143,10 +141,8 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             String creator = username;
             String taskHandler = ((TextInputEditText)findViewById(R.id.edtTaskHandler)).getText().toString();
 
-            String test = "image.png";
-            Charset charset = StandardCharsets.UTF_16;
-            byte[] confirmationI = test.getBytes(charset);
-            System.out.println(confirmationI);
+
+            byte[] confirmationI = JDBCUtils.fromStringToBytes("image.png");
 
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
@@ -173,9 +169,6 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    public void clickUploadImage(View view) {
     }
 
 }

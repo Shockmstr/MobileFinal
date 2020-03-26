@@ -159,6 +159,49 @@ public class PersonalTaskInfoDAO {
         return result;
     }
 
+    public List<PersonalTaskInfoDTO> getAllTasksHandlerByUsernameAndCreatorByManagerId(String username, String managerUsername){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<PersonalTaskInfoDTO> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
+                        "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage from PersonalTaskInfo where TaskHandler=? AND (Creator=? OR Creator=?)";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, username);
+                stm.setString(2, username);
+                stm.setString(3, managerUsername);
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("TaskID");
+                    String name = rs.getString("TaskName");
+                    String desc = rs.getString("TaskDescription");
+                    String handlingContent = rs.getString("TaskHandlingContent");
+                    String status = rs.getString("Status");
+                    String creator = rs.getString("Creator");
+                    String sRole = rs.getString("CreatorRole");
+                    String handler = rs.getString("TaskHandler");
+                    String confirm = rs.getString("TaskConfirmation");
+                    byte[] image = rs.getBytes("ConfirmationImage");
+                    PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
+                    infoDTO.setId(id);
+                    infoDTO.setCreatorRole(Role.valueOf(sRole));
+                    result.add(infoDTO);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
     public List<PersonalTaskInfoDTO> getAllTaskFromUserWithManagerId(int managerId){
         Connection conn = null;
         PreparedStatement stm = null;

@@ -19,12 +19,12 @@ public class ManagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manager);
+        Intent intent = this.getIntent();
+        username = intent.getStringExtra("USERNAME");
         getWelcome();
     }
 
     private void getWelcome(){
-        Intent intent = this.getIntent();
-        username = intent.getStringExtra("USERNAME");
         UserDAO dao = new UserDAO();
         UserDTO dto = dao.getUserByUsername(username);
         TextView txtWelcome = findViewById(R.id.txtManagerWelcome);
@@ -48,9 +48,19 @@ public class ManagerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onClickViewUserTask(View view) {
-        Intent intent = new Intent(this, TaskManagerListActivity.class);
+    public void onClickViewGroupTask(View view) {
+        Intent intent = new Intent(this, ViewGroupTaskListActivity.class);
         intent.putExtra("USERNAME", username);
+        startActivity(intent);
+    }
+
+    public void logout(View view) {
+        this.setResult(RESULT_OK);
+        finish();
+    }
+
+    public void onClickScanQR(View view) {
+        Intent intent = new Intent(this, ScannerViewActivity.class);
         startActivity(intent);
     }
 }

@@ -34,6 +34,15 @@
             android:layout_height="wrap_content"
             android:text="View Task"
             android:onClick="onClickViewTask"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create QR Code"
+            android:onClick="onClickNewQRCode"/>
+        <ImageView
+            android:id="@+id/imgQR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
     <Button
         android:onClick="logout"

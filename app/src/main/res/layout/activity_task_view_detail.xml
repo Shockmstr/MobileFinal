@@ -193,22 +193,6 @@
                 android:layout_marginStart="20sp" />
         </LinearLayout>
 
-
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Upload Image"
-            android:onClick="clickEditUploadImage"/>
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtConfirmationImage"/>
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

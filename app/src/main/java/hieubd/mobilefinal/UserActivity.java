@@ -1,17 +1,23 @@
 package hieubd.mobilefinal;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
 import java.io.Serializable;
 
 import hieubd.dao.UserDAO;
 import hieubd.dto.UserDTO;
+import hieubd.util.QRCodeHelper;
 
 public class UserActivity extends AppCompatActivity {
     private static int REQUEST_CREATE_CODE = 6789;
@@ -54,7 +60,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     public void onClickViewTask(View view) {
-        Intent intent = new Intent(this, TaskListActivity.class);
+        Intent intent = new Intent(this, ViewGroupTaskListActivity.class);
         intent.putExtra("USERNAME", username);
         startActivity(intent);
     }
@@ -62,5 +68,23 @@ public class UserActivity extends AppCompatActivity {
     public void logout(View view) {
         this.setResult(RESULT_OK);
         finish();
+    }
+
+    public void onClickNewQRCode(View view) {
+        try {
+            UserDAO userDAO = new UserDAO();
+            UserDTO user = userDAO.getUserByUsername(username);
+            String userSerialized = new Gson().toJson(user);
+            Bitmap bitmap = QRCodeHelper.newInstance(this)
+                            .setContent(userSerialized)
+                            .setErrorCorrectionLevel(ErrorCorrectionLevel.Q)
+                            .setMargin(2)
+                            .getQRCOde();
+
+            ImageView img = findViewById(R.id.imgQR);
+            img.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

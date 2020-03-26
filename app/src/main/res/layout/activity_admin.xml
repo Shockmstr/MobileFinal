@@ -56,5 +56,12 @@
             android:layout_height="wrap_content"
             android:text="Manage Group"
             android:onClick="onClickManageGroup"/>
+        <Button
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:textColor="@android:color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Logout"
+            android:onClick="logout"/>
     </LinearLayout>
 </ScrollView>

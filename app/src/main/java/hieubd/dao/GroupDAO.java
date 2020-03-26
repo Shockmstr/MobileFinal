@@ -100,6 +100,92 @@ public class GroupDAO {
         return result;
     }
 
+    public List<GroupDTO> getAllGroupByManagerId(int managerId){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<GroupDTO> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select GroupID, GroupName from GroupInfo where ManagerID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, managerId);
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("GroupID");
+                    String name = rs.getString("GroupName");
+                    GroupDTO dto = new GroupDTO(id, name, managerId);
+                    result.add(dto);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public List<Integer> getAllGroupIdByUserId(int userId){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<Integer> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select GroupID from GroupUser where UserID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, userId);
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("GroupID");
+                    result.add(id);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public List<Integer> getAllUserIdByGroupId(int groupID){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<Integer> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select UserID from GroupUser where GroupID=?";
+                stm = conn.prepareStatement(sql);
+                stm.setInt(1, groupID);
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("UserID");
+                    result.add(id);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
     public GroupDTO getGroupById(int id){
         Connection conn = null;
         PreparedStatement stm = null;
@@ -192,7 +278,7 @@ public class GroupDAO {
         return result;
     }
 
-    public boolean deleteUserFromGroup(int userId){
+    public boolean deleteUserFromGroup(int userId, int groupId){
         Connection conn = null;
         PreparedStatement stm = null;
         ResultSet rs = null;
@@ -200,9 +286,10 @@ public class GroupDAO {
         try {
             conn = JDBCUtils.getMyConnection();
             if (conn != null){
-                String sql = "Delete from GroupUser where UserID=?";
+                String sql = "Delete from GroupUser where UserID=? and GroupID=?";
                 stm = conn.prepareStatement(sql);
                 stm.setInt(1, userId);
+                stm.setInt(2, groupId);
                 result = stm.executeUpdate() > 0;
             }
         }catch (SQLException e) {

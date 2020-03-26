@@ -33,8 +33,6 @@ public class ManageGroupActivity extends AppCompatActivity {
         createListView();
     }
 
-
-
     private void createListView(){
         GroupDAO dao = new GroupDAO();
         List<GroupDTO> groupList = dao.getAllGroup();

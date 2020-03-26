@@ -3,7 +3,6 @@ package hieubd.mobilefinal;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -35,6 +34,7 @@ import java.util.List;
 import hieubd.dao.PersonalTaskInfoDAO;
 import hieubd.dao.PersonalTaskManagerDAO;
 import hieubd.dao.PersonalTaskTimeDAO;
+import hieubd.dao.UserDAO;
 import hieubd.dto.PersonalTaskInfoDTO;
 import hieubd.dto.PersonalTaskManagerDTO;
 import hieubd.dto.PersonalTaskTimeDTO;
@@ -56,7 +56,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         getInfoFromIntent();
         filterRoleForTask();
         createSpinnerStatus();
-        createSpinnerConfirmation();
         autoFillAllDetails();
         managerMarkValidate();
     }
@@ -82,7 +81,7 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             Button btnConfirm = findViewById(R.id.btnConfirm);
             btnConfirm.setEnabled(false);
         }
-        if (managerIsViewingHisEdit == true){
+        if (managerIsViewingHisEdit){
             TextInputEditText edtEditComment = findViewById(R.id.edtEditComment);
             edtEditComment.setEnabled(false);
             EditText edtEditMark = findViewById(R.id.edtEditMark);
@@ -144,14 +143,15 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
     private void formatBtnConfirm(Button btnConfirm){
         String confirm = btnConfirm.getText().toString();
         switch (confirm){
+            case "Not Confirmed":
             case "Waiting":
                 break;
             case "Accepted":
-                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN);
+                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
                 btnConfirm.setTextColor(Color.WHITE);
                 break;
             case "Denied":
-                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.RED);
+                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
                 btnConfirm.setTextColor(Color.WHITE);
                 break;
         }
@@ -251,18 +251,6 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         }
     };
 
-    private Spinner.OnItemSelectedListener spnConfirmListener = new AdapterView.OnItemSelectedListener() {
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            selectedConfirm = adapterView.getItemAtPosition(i).toString();
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-
-        }
-    };
-
     private void createSpinnerStatus(){
         Spinner spnStatus = findViewById(R.id.spnEditStatus);
         List<String> statuses = new ArrayList<>();
@@ -270,46 +258,34 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         statuses.add("In progress");
         statuses.add("Finished");
         statuses.add("Overdue");
-        statuses.add("Unable to start");
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, statuses);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spnStatus.setAdapter(adapter);
     }
 
-    private void createSpinnerConfirmation(){
-        Spinner spnConfirm = findViewById(R.id.spnEditConfirmation);
-        List<String> confirms = new ArrayList<>();
-        confirms.add("Not Confirmed");
-        confirms.add("Done");
-        confirms.add("Unable to start");
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, confirms);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spnConfirm.setAdapter(adapter);
-    }
-
     private void submitEdit(){
         try{
             String error = "";
-            String name = ((EditText)findViewById(R.id.edtEditTaskName)).getText().toString();
-            String description = ((EditText)findViewById(R.id.edtEditDescription)).getText().toString();
-            String handlingContent = ((EditText)findViewById(R.id.edtEditHandlingContent)).getText().toString();
+            String name = ((TextInputEditText)findViewById(R.id.edtEditTaskName)).getText().toString();
+            String description = ((TextInputEditText)findViewById(R.id.edtEditDescription)).getText().toString();
+            String handlingContent = ((TextInputEditText)findViewById(R.id.edtEditHandlingContent)).getText().toString();
             String status = selectedStatus;
-            String confirm = selectedConfirm;
+            String confirm = ((Button)findViewById(R.id.btnConfirm)).getText().toString();
             String txtTimeBegin = ((TextView)findViewById(R.id.txtEditTimeBegin)).getText().toString();
             Timestamp dateBegin = JDBCUtils.fromStringToTime(txtTimeBegin);
             String txtTimeFinish = ((TextView)findViewById(R.id.txtEditTimeFinish)).getText().toString();
             Timestamp dateFinish = JDBCUtils.fromStringToTime(txtTimeFinish);
             String txtTimeCreated = ((TextView)findViewById(R.id.txtEditTimeCreated)).getText().toString();
             Timestamp dateCreated = JDBCUtils.fromStringToTime(txtTimeCreated);
-            String creator = ((EditText)findViewById(R.id.edtEditCreator)).getText().toString();
-            String taskHandler = ((EditText)findViewById(R.id.edtEditTaskHandler)).getText().toString();
+            String creator = ((TextInputEditText)findViewById(R.id.edtEditCreator)).getText().toString();
+            String taskHandler = ((TextInputEditText)findViewById(R.id.edtEditTaskHandler)).getText().toString();
             String comment = null;
             String mark = null;
             Timestamp dateComment = null;
             if (userRole == Role.Manager){
-                comment = ((EditText)findViewById(R.id.edtEditComment)).getText().toString();
+                comment = ((TextInputEditText)findViewById(R.id.edtEditComment)).getText().toString();
                 mark = ((EditText)findViewById(R.id.edtEditMark)).getText().toString();
-                if (mark == null || mark.isEmpty()) mark = "-1";
+                //if (mark == null || mark.isEmpty()) mark = "-1";
                 String txtTimeComment = ((TextView)findViewById(R.id.txtEditTimeComment)).getText().toString();
                 dateComment = JDBCUtils.fromStringToTime(txtTimeComment);
             }
@@ -317,33 +293,54 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             String image = "image.png";
             byte[] confirmationI = JDBCUtils.fromStringToBytes(image);
 
-            PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
-            PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-            PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
-            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
-            infoDTO.setId(thisTaskId);
-            //System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
-            if (infoDAO.updateTask(infoDTO)){
-                PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(thisTaskId, dateBegin, dateFinish, dateCreated);
-                //System.out.println(thisTaskId + dateBegin.toString() + dateFinish.toString() + dateCreated.toString());
-                PersonalTaskManagerDTO managerDTO = new PersonalTaskManagerDTO(thisTaskId, comment, Integer.parseInt(mark), dateComment);
-                if (timeDAO.updateTask(timeDTO));
-                else error += "\nCannot update task! Please check the date inputs again.";
-                if (managerDAO.updateTask(managerDTO));
-                else{
-                    managerDAO.createNewTaskManager(managerDTO);
-                }
+            //Validate
+            UserDAO userDAO = new UserDAO();
+            if (name.isEmpty()) error += "Name is empty\n";
+            if (description.isEmpty()) error += "Description is empty\n";
+            if (handlingContent.isEmpty()) error += "Handling content is empty\n";
+            if (!userDAO.checkUsernameIsExisted(creator)) error += "Creator not existed\n";
+            if (!userDAO.checkUsernameIsExisted(taskHandler)) error += "Task Handler not existed\n";
+            if (userRole == Role.Manager){
+                if (comment.isEmpty()) error += "Comment is empty\n";
+                if (mark == null || mark.isEmpty()) error += "Please add mark\n";
 
-            }else{
-                error += "\nCannot update task! Please check the details again.";
             }
 
             if (error.equals("")){
-                Intent intent = this.getIntent();
-                this.setResult(RESULT_OK, intent);
-                finish();
+                PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
+                PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
+                PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
+                PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
+                infoDTO.setId(thisTaskId);
+                //System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
+                if (infoDAO.updateTask(infoDTO)){
+                    PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(thisTaskId, dateBegin, dateFinish, dateCreated);
+                    //System.out.println(thisTaskId + dateBegin.toString() + dateFinish.toString() + dateCreated.toString());
+                    if (userRole == Role.Manager){
+                        PersonalTaskManagerDTO managerDTO = new PersonalTaskManagerDTO(thisTaskId, comment, Integer.parseInt(mark), dateComment);
+                        if (managerDAO.updateTask(managerDTO));
+                        else{
+                            managerDAO.createNewTaskManager(managerDTO);
+                        }
+                    }
+                    if (timeDAO.updateTask(timeDTO));
+                    else error += "\nCannot update task! Please check the date inputs again.";
+                }else{
+                    error += "\nCannot update task! Please check the details again.";
+                }
+
+                if (error.equals("")){
+                    Intent intent = this.getIntent();
+                    this.setResult(RESULT_OK, intent);
+                    finish();
+                }else{
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                }
             }else{
-                Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                new AlertDialog.Builder(this).setTitle("Error").setMessage(error)
+                        .setPositiveButton("Confirm", (dialogInterface, i) -> {
+                            // do nothing
+                        }).show();
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -355,18 +352,9 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         alertDialog.setTitle("Confirmation");
         alertDialog.setIcon(R.mipmap.ic_launcher);
         alertDialog.setMessage("Are you sure you want to submit the edit?");
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                submitEdit();
-            }
-        });
-
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                // Do Nothing
-            }
+        alertDialog.setPositiveButton("Yes", (dialogInterface, i) -> submitEdit());
+        alertDialog.setNegativeButton("No", (dialogInterface, i) -> {
+            // Do Nothing
         });
         alertDialog.show();
     }
@@ -376,7 +364,7 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
             PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
-            boolean result = managerDAO.deleteTask(thisTaskId) && timeDAO.deleteTask(thisTaskId) && infoDAO.deleteTask(thisTaskId) ;
+            boolean result = infoDAO.deleteTask(thisTaskId) ;
             if (result){
                 Toast.makeText(this, "Delete task successfully", Toast.LENGTH_SHORT ).show();
                 Intent intent = this.getIntent();
@@ -395,18 +383,9 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         alertDialog.setTitle("Confirmation");
         alertDialog.setIcon(R.mipmap.ic_launcher);
         alertDialog.setMessage("Are you sure you want to delete this task?");
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                deleteThisTask();
-            }
-        });
-
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                // Do Nothing
-            }
+        alertDialog.setPositiveButton("Yes", (dialogInterface, i) -> deleteThisTask());
+        alertDialog.setNegativeButton("No", (dialogInterface, i) -> {
+            // Do Nothing
         });
         alertDialog.show();
     }

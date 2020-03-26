@@ -259,7 +259,7 @@ public class MemberFragment extends Fragment {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 GroupDAO groupDAO = new GroupDAO();
                                 //updateTheGroupDto();
-                                if (groupDAO.deleteUserFromGroup(user.getId())){
+                                if (groupDAO.deleteUserFromGroup(user.getId(), dto.getId())){
                                     Toast.makeText(view.getContext(), "User deleted", Toast.LENGTH_SHORT).show();
                                     updateTheGroupDto();
                                     List<UserDTO> userDTOList2 = userDAO.getAllUserByGroupID(dto.getId());
