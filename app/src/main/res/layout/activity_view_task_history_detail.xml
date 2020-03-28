@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".history.ViewTaskHistoryDetailActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15sp"
+            android:layout_marginBottom="15sp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:text="Task Detail"
+            android:textColor="@android:color/black"
+            android:textAllCaps="true"
+            android:textSize="40dp"
+            />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Name"
+            android:focusable="false"
+            app:boxStrokeColor="@color/colorPrimaryDark"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtHistoryTaskName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:inputType="text"
+                android:maxLength="50"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_marginTop="10sp"
+            app:boxStrokeColor="@color/colorPrimaryDark"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtHistoryDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Description"
+                android:focusable="false"
+                android:gravity="start|top"
+                android:inputType="textMultiLine"
+                android:maxLength="100"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            app:boxStrokeColor="@color/colorPrimaryDark"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtHistoryHandlingContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Handling Content"
+                android:focusable="false"
+                android:gravity="start|top"
+                android:inputType="textMultiLine" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/colorPrimaryDark"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Creator"
+                android:focusable="false"
+                android:inputType="text"
+                android:id="@+id/edtHistoryCreator"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/colorPrimaryDark"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Task Handler"
+                android:focusable="false"
+                android:inputType="text"
+                android:id="@+id/edtHistoryTaskHandler"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time Begin: "
+                android:layout_weight="0.1"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtHistoryTimeBegin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DD/MM/YYYY"
+                android:layout_weight="0.7"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time Finish: "
+                android:layout_weight="0.1"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtHistoryTimeFinish"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DD/MM/YYYY"
+                android:layout_weight="0.7"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time Created: "
+                android:layout_weight="0.1"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/txtHistoryTimeCreated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DD/MM/YYYY"
+                android:layout_weight="0.9"
+                android:textSize="18sp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="15sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status:"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:id="@+id/txtHistoryStatus"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Confirmation:"
+                android:textSize="18sp"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:id="@+id/btnHistoryConfirm"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/managerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/border"
+            android:padding="10sp"
+            android:layout_marginTop="10sp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="- Evaluation Part -"
+                android:textColor="@android:color/black"
+                android:fontFamily="sans-serif"
+                android:gravity="center"
+                />
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:boxStrokeColor="@color/colorPrimaryDark"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Comment"
+                    android:focusable="false"
+                    android:inputType="textMultiLine"
+                    android:id="@+id/edtHistoryComment"/>
+            </com.google.android.material.textfield.TextInputLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mark:"
+                    android:textSize="20sp"/>
+                <EditText
+                    android:focusable="false"
+                    android:layout_marginLeft="20sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:id="@+id/edtHistoryMark"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Time Comment: "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/txtHistoryTimeComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DD/MM/YYYY"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10sp"
+            >
+
+            <Button
+                android:id="@+id/btnEditSubmit"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5"
+                android:backgroundTint="@android:color/darker_gray"
+                android:onClick="onClickReturn"
+                android:text="Return" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

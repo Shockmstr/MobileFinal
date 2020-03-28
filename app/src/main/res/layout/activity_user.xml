@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,6 +23,7 @@
             android:textColor="#1F6838"
             android:id="@+id/txtWelcome"/>
 
+
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -37,18 +38,26 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="View Task History"
+            android:layout_marginTop="20sp"
+            android:onClick="onClickViewTaskHistory"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="Create QR Code"
             android:onClick="onClickNewQRCode"/>
         <ImageView
             android:id="@+id/imgQR"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+        <Button
+            android:onClick="logout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:text="Logout"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
-    <Button
-        android:onClick="logout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Logout"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:textColor="@android:color/white"/>
-</LinearLayout>
+
+</ScrollView>

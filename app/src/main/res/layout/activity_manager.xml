@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -40,12 +40,19 @@
         android:layout_height="wrap_content"
         android:text="View/ Comment Group Task"
         android:onClick="onClickViewGroupTask"/>
+
+    <Button
+        android:layout_marginTop="20sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View Task History"
+        android:onClick="onClickViewTaskHistory"/>
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Scan QR Code"
         android:onClick="onClickScanQR"/>
-    </LinearLayout>
+
     <Button
         android:onClick="logout"
         android:layout_width="match_parent"
@@ -53,4 +60,5 @@
         android:text="Logout"
         android:backgroundTint="@color/colorPrimaryDark"
         android:textColor="@android:color/white"/>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

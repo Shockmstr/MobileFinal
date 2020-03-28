@@ -11,6 +11,7 @@ import java.io.Serializable;
 
 import hieubd.dao.UserDAO;
 import hieubd.dto.UserDTO;
+import hieubd.mobilefinal.history.ViewTaskHistoryListActivity;
 
 public class ManagerActivity extends AppCompatActivity {
     private static int REQUEST_CREATE_CODE = 6789;
@@ -61,6 +62,12 @@ public class ManagerActivity extends AppCompatActivity {
 
     public void onClickScanQR(View view) {
         Intent intent = new Intent(this, ScannerViewActivity.class);
+        startActivity(intent);
+    }
+
+    public void onClickViewTaskHistory(View view) {
+        Intent intent = new Intent(this, ViewTaskHistoryListActivity.class);
+        intent.putExtra("USERNAME", username);
         startActivity(intent);
     }
 }

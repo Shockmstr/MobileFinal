@@ -82,6 +82,52 @@ public class PersonalTaskTimeDAO {
         return result;
     }
 
+    public List<PersonalTaskTimeDTO> getAllTaskBetweenDate(Timestamp dateFrom, Timestamp dateTo){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<PersonalTaskTimeDTO> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                if (dateFrom == null && dateTo == null) {
+                    String sql = "Select TaskID, TimeBegin, TimeFinish, TimeCreated from PersonalTaskTime";
+                    stm = conn.prepareStatement(sql);
+                }else if (dateTo == null){
+                    String sql = "Select TaskID, TimeBegin, TimeFinish, TimeCreated from PersonalTaskTime where TimeBegin >= ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setTimestamp(1, dateFrom);
+                }else if (dateFrom == null){
+                    String sql = "Select TaskID, TimeBegin, TimeFinish, TimeCreated from PersonalTaskTime where TimeFinish <= ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setTimestamp(1, dateTo);
+                }else{
+                    String sql = "Select TaskID, TimeBegin, TimeFinish, TimeCreated from PersonalTaskTime where TimeBegin >= ? AND TimeFinish <= ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setTimestamp(1, dateFrom);
+                    stm.setTimestamp(2, dateTo);
+                }
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("TaskID");
+                    Timestamp timeBegin = rs.getTimestamp("TimeBegin");
+                    Timestamp timeFinished = rs.getTimestamp("TimeFinish");
+                    Timestamp timeCreated = rs.getTimestamp("TimeCreated");
+                    PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(id, timeBegin, timeFinished, timeCreated);
+                    result.add(timeDTO);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
     public PersonalTaskTimeDTO getTaskById(int id){
         PreparedStatement stm = null;
         ResultSet rs = null;

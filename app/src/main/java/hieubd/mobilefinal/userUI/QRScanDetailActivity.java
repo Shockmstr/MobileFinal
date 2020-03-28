@@ -37,9 +37,9 @@ public class QRScanDetailActivity extends AppCompatActivity {
         txtFullname.setText(fullname);
         txtRole.setText(role.toString());
 
-        txtUsername.setEnabled(false);
-        txtFullname.setEnabled(false);
-        txtRole.setEnabled(false);
+        txtUsername.setFocusable(false);
+        txtFullname.setFocusable(false);
+        txtRole.setFocusable(false);
     }
     public void onClickBack(View view) {
         Intent intent = this.getIntent();

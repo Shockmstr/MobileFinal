@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import hieubd.dao.UserDAO;
 import hieubd.dto.UserDTO;
+import hieubd.mobilefinal.history.ViewTaskHistoryListActivity;
 import hieubd.util.QRCodeHelper;
 
 public class UserActivity extends AppCompatActivity {
@@ -86,5 +87,11 @@ public class UserActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void onClickViewTaskHistory(View view) {
+        Intent intent = new Intent(this, ViewTaskHistoryListActivity.class);
+        intent.putExtra("USERNAME", username);
+        startActivity(intent);
     }
 }

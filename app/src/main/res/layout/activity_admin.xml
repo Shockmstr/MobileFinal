@@ -37,6 +37,11 @@
             android:layout_height="wrap_content"
             android:text="View / Comment Task"
             android:onClick="onClickViewUserTask"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search Task"
+            android:onClick="onClickSearchTask"/>
 
         <Button
             android:layout_marginTop="40sp"

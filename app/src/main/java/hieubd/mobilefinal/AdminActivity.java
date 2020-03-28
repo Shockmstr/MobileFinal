@@ -12,6 +12,7 @@ import java.io.Serializable;
 
 import hieubd.dao.UserDAO;
 import hieubd.dto.UserDTO;
+import hieubd.mobilefinal.statistics.SearchTaskActivity;
 import hieubd.mobilefinal.userUI.NewUserActivity;
 import hieubd.mobilefinal.userUI.UserListActivity;
 
@@ -86,5 +87,13 @@ public class AdminActivity extends AppCompatActivity {
     public void logout(View view) {
         this.setResult(RESULT_OK);
         finish();
+    }
+
+    public void onClickSearchTask(View view) {
+        Intent intent = new Intent(this, SearchTaskActivity.class);
+        UserDAO dao = new UserDAO();
+        UserDTO dto = dao.getUserByUsername(username);
+        intent.putExtra("ROLE", (Serializable)dto.getRole());
+        startActivity(intent);
     }
 }

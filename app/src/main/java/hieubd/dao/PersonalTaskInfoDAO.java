@@ -9,6 +9,7 @@ import java.util.List;
 
 import hieubd.dto.PersonalTaskInfoDTO;
 import hieubd.dto.Role;
+import hieubd.dto.UserDTO;
 import hieubd.jdbc.JDBCUtils;
 
 public class PersonalTaskInfoDAO {
@@ -89,6 +90,49 @@ public class PersonalTaskInfoDAO {
                 String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
                         "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage from PersonalTaskInfo";
                 stm = conn.prepareStatement(sql);
+                rs = stm.executeQuery();
+                while(rs.next()){
+                    if (result == null){
+                        result = new ArrayList<>();
+                    }
+                    int id = rs.getInt("TaskID");
+                    String name = rs.getString("TaskName");
+                    String desc = rs.getString("TaskDescription");
+                    String handlingContent = rs.getString("TaskHandlingContent");
+                    String status = rs.getString("Status");
+                    String creator = rs.getString("Creator");
+                    String sRole = rs.getString("CreatorRole");
+                    String handler = rs.getString("TaskHandler");
+                    String confirm = rs.getString("TaskConfirmation");
+                    byte[] image = rs.getBytes("ConfirmationImage");
+                    PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
+                    infoDTO.setId(id);
+                    infoDTO.setCreatorRole(Role.valueOf(sRole));
+                    result.add(infoDTO);
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
+    public List<PersonalTaskInfoDTO> getAllTasksStatusFinished(String username){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        List<PersonalTaskInfoDTO> result = null;
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
+                        "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage from PersonalTaskInfo where Status = ? AND (Creator = ? Or TaskHandler = ?)";
+                stm = conn.prepareStatement(sql);
+                stm.setString(1, "Finished");
+                stm.setString(2, username);
+                stm.setString(3, username);
                 rs = stm.executeQuery();
                 while(rs.next()){
                     if (result == null){
@@ -284,6 +328,65 @@ public class PersonalTaskInfoDAO {
         return result;
     }
 
+    public PersonalTaskInfoDTO getTaskByIdWithConditions(int id, String status, String taskHandler){
+        Connection conn = null;
+        PreparedStatement stm = null;
+        ResultSet rs = null;
+        PersonalTaskInfoDTO result = null;
+
+        try {
+            conn = JDBCUtils.getMyConnection();
+            if (conn != null){
+                if (status.equalsIgnoreCase("All") && taskHandler == null){
+                    String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
+                            "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage FROM PersonalTaskInfo WHERE TaskID = ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setInt(1, id);
+                }else if (status.equalsIgnoreCase("All")){
+                    String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
+                            "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage FROM PersonalTaskInfo WHERE TaskID = ? AND TaskHandler = ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setInt(1, id);
+                    stm.setString(2, taskHandler);
+                }else if (taskHandler == null){
+                    String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
+                            "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage FROM PersonalTaskInfo WHERE TaskID = ? AND Status = ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setInt(1, id);
+                    stm.setString(2, status);
+                }else{
+                    String sql = "Select TaskID, TaskName, TaskDescription, TaskHandlingContent, Status, Creator, " +
+                            "CreatorRole, TaskHandler, TaskConfirmation, ConfirmationImage FROM PersonalTaskInfo WHERE TaskID = ? AND Status = ? AND TaskHandler = ?";
+                    stm = conn.prepareStatement(sql);
+                    stm.setInt(1, id);
+                    stm.setString(2, status);
+                    stm.setString(3, taskHandler);
+                }
+                rs = stm.executeQuery();
+                if(rs.next()){
+                    int sId = rs.getInt("TaskID");
+                    String name = rs.getString("TaskName");
+                    String desc = rs.getString("TaskDescription");
+                    String handlingContent = rs.getString("TaskHandlingContent");
+                    String sStatus = rs.getString("Status");
+                    String creator = rs.getString("Creator");
+                    String sRole = rs.getString("CreatorRole");
+                    String handler = rs.getString("TaskHandler");;
+                    String confirm = rs.getString("TaskConfirmation");
+                    byte[] image = rs.getBytes("ConfirmationImage");
+                    result = new PersonalTaskInfoDTO(name, desc, handlingContent, sStatus, creator, handler, confirm, image);
+                    result.setId(sId);
+                    result.setCreatorRole(Role.valueOf(sRole));
+                }
+            }
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally{
+            closeConnection(conn, stm, rs);
+        }
+        return result;
+    }
+
     public PersonalTaskInfoDTO getTaskById(int id){
         Connection conn = null;
         PreparedStatement stm = null;
@@ -318,67 +421,6 @@ public class PersonalTaskInfoDAO {
             closeConnection(conn, stm, rs);
         }
         return dto;
-    }
-
-    public List<String> getAllTaskIdAndNameByTaskHandler(String username){
-        Connection conn = null;
-        PreparedStatement stm = null;
-        ResultSet rs = null;
-        List<String> result = null;
-        try {
-            conn = JDBCUtils.getMyConnection();
-            if (conn != null){
-                String sql = "Select TaskID, TaskName from PersonalTaskInfo where TaskHandler=?";
-                stm = conn.prepareStatement(sql);
-                stm.setString(1, username);
-                rs = stm.executeQuery();
-                while(rs.next()){
-                    if (result == null){
-                        result = new ArrayList<>();
-                    }
-                    int id = rs.getInt("TaskID");
-                    String name = rs.getString("TaskName");
-                    String str = id + " - " + name;
-                    result.add(str);
-                }
-            }
-        }catch (SQLException e) {
-            e.printStackTrace();
-        }finally{
-            closeConnection(conn, stm, rs);
-        }
-        return result;
-    }
-
-    public List<String> getAllTaskIdAndNameByTaskHandlerExcludeTaskID(String username, int taskId){
-        Connection conn = null;
-        PreparedStatement stm = null;
-        ResultSet rs = null;
-        List<String> result = null;
-        try {
-            conn = JDBCUtils.getMyConnection();
-            if (conn != null){
-                String sql = "Select TaskID, TaskName from PersonalTaskInfo where TaskHandler=? and TaskID != ?";
-                stm = conn.prepareStatement(sql);
-                stm.setString(1, username);
-                stm.setInt(2, taskId);
-                rs = stm.executeQuery();
-                while(rs.next()){
-                    if (result == null){
-                        result = new ArrayList<>();
-                    }
-                    int id = rs.getInt("TaskID");
-                    String name = rs.getString("TaskName");
-                    String str = id + " - " + name;
-                    result.add(str);
-                }
-            }
-        }catch (SQLException e) {
-            e.printStackTrace();
-        }finally{
-            closeConnection(conn, stm, rs);
-        }
-        return result;
     }
 
     public boolean updateTask(PersonalTaskInfoDTO infoDTO){
