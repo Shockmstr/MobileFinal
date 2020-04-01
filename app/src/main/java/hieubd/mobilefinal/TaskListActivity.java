@@ -104,9 +104,11 @@ public class TaskListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Intent intent = new Intent(TaskListActivity.this, TaskViewDetailActivity.class);
                 PersonalTaskInfoDTO infoDTO = (PersonalTaskInfoDTO) taskAdapter.getItem(i);
-                intent.putExtra("MANAGERFLAG", true);
+                if (infoDTO.getTaskHandler().equals(username)){
+                    intent.putExtra("MANAGERFLAG", 1);
+                }
                 intent.putExtra("DTO", infoDTO);
-                intent.putExtra("ROLE", infoDTO.getCreatorRole());
+                intent.putExtra("ROLE", thisUser.getRole());
                 startActivityForResult(intent, REQUEST_EDIT_CODE_2);
             }
         });
@@ -129,9 +131,31 @@ public class TaskListActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK){
                 PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
                 PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
+                GroupDAO groupDAO = new GroupDAO();
                 UserDAO userDAO = new UserDAO();
                 UserDTO manager = userDAO.getUserById(groupDTO.getManagerId());
-                infoDTOList = infoDAO.getAllTasksHandlerByUsernameAndCreatorByManagerId(username, manager.getUsername());
+                UserDTO thisUser = userDAO.getUserByUsername(username);
+                if (manager == null) manager = thisUser;
+                if (thisUser.getRole() == Role.User){
+                    infoDTOList = infoDAO.getAllTasksHandlerByUsernameAndCreatorByManagerId(username, manager.getUsername());
+                }else if (thisUser.getRole() == Role.Manager){
+                    List<Integer> tmp = groupDAO.getAllUserIdByGroupId(groupDTO.getId());
+                    infoDTOList = new ArrayList<>();
+                    if (tmp != null){
+                        for (Integer id: tmp
+                        ) {
+                            UserDTO userTMP = userDAO.getUserById(id);
+                            List<PersonalTaskInfoDTO> groupTMP = infoDAO.getAllTasksHandlerByUsernameAndCreatorByManagerId(userTMP.getUsername(), manager.getUsername());
+                            if (groupTMP != null){
+                                infoDTOList.addAll(groupTMP);
+                            }
+                        }
+                    }
+                    List<PersonalTaskInfoDTO> groupTMP2 = infoDAO.getAllTasksHandlerByUsernameAndCreatorByManagerId(username, manager.getUsername());
+                    if (groupTMP2 != null){
+                        infoDTOList.addAll(groupTMP2);
+                    }
+                }
                 timeDTOList = timeDAO.getMultipleTaskById(infoDTOList);
                 taskAdapter.setTaskInfoDTOList(infoDTOList);
                 taskAdapter.setTaskTimeDTOList(timeDTOList);

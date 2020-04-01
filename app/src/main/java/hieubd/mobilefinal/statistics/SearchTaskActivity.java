@@ -178,6 +178,7 @@ public class SearchTaskActivity extends AppCompatActivity implements DatePickerD
         if (requestCode == 5000){
             if (resultCode == RESULT_OK){
                 // do nothing
+                taskListView.setAdapter(null);
             }
         }
     }

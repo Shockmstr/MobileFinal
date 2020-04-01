@@ -9,7 +9,6 @@ import java.util.List;
 
 import hieubd.dto.PersonalTaskInfoDTO;
 import hieubd.dto.Role;
-import hieubd.dto.UserDTO;
 import hieubd.jdbc.JDBCUtils;
 
 public class PersonalTaskInfoDAO {
@@ -45,7 +44,7 @@ public class PersonalTaskInfoDAO {
                 stm.setString(6, role.toString());
                 stm.setString(7, infoDTO.getTaskHandler());
                 stm.setString(8, infoDTO.getConfirmation());
-                stm.setBytes(9, infoDTO.getConfirmationImage());
+                stm.setString(9, infoDTO.getConfirmationImage());
                 result = stm.executeUpdate() > 0;
             }
         }catch (SQLException e) {
@@ -104,7 +103,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     infoDTO.setId(id);
                     infoDTO.setCreatorRole(Role.valueOf(sRole));
@@ -147,7 +146,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     infoDTO.setId(id);
                     infoDTO.setCreatorRole(Role.valueOf(sRole));
@@ -188,7 +187,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = username;
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     infoDTO.setId(id);
                     infoDTO.setCreatorRole(Role.valueOf(sRole));
@@ -231,7 +230,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     infoDTO.setId(id);
                     infoDTO.setCreatorRole(Role.valueOf(sRole));
@@ -272,7 +271,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");;
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     infoDTO.setId(id);
                     infoDTO.setCreatorRole(Role.valueOf(sRole));
@@ -313,7 +312,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");;
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     infoDTO.setId(id);
                     infoDTO.setCreatorRole(Role.valueOf(sRole));
@@ -373,7 +372,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");;
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     result = new PersonalTaskInfoDTO(name, desc, handlingContent, sStatus, creator, handler, confirm, image);
                     result.setId(sId);
                     result.setCreatorRole(Role.valueOf(sRole));
@@ -409,7 +408,7 @@ public class PersonalTaskInfoDAO {
                     String sRole = rs.getString("CreatorRole");
                     String handler = rs.getString("TaskHandler");
                     String confirm = rs.getString("TaskConfirmation");
-                    byte[] image = rs.getBytes("ConfirmationImage");
+                    String image = rs.getString("ConfirmationImage");
                     dto = new PersonalTaskInfoDTO(name, desc, handlingContent, status, creator, handler, confirm, image);
                     dto.setId(id);
                     dto.setCreatorRole(Role.valueOf(sRole));
@@ -441,7 +440,7 @@ public class PersonalTaskInfoDAO {
                 stm.setString(5, infoDTO.getCreator());
                 stm.setString(6, infoDTO.getTaskHandler());
                 stm.setString(7, infoDTO.getConfirmation());
-                stm.setBytes(8, infoDTO.getConfirmationImage());
+                stm.setString(8, infoDTO.getConfirmationImage());
                 stm.setInt(9, infoDTO.getId());
                 result = stm.executeUpdate() > 0;
             }

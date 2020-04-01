@@ -1,12 +1,17 @@
 package hieubd.mobilefinal;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -15,21 +20,31 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import hieubd.dao.PersonalTaskInfoDAO;
 import hieubd.dao.PersonalTaskManagerDAO;
@@ -48,11 +63,18 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
     private Role userRole;
     private String username;
     private PersonalTaskInfoDTO infoDTO;
+    private Uri selectedImage;
+    private String oldImage;
+    private boolean imageIsEdited = false;
+    private FirebaseStorage storage; // used to create a FirebaseStorage instance
+    private StorageReference storageReference; // point to the uploaded file
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_view_detail);
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
         getInfoFromIntent();
         filterRoleForTask();
         createSpinnerStatus();
@@ -70,26 +92,28 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
 
     private void filterRoleForTask(){
         Intent intent = this.getIntent();
-        boolean managerIsViewingHisEdit = intent.getBooleanExtra("MANAGERFLAG", false);
+        int managerIsViewingHisEdit = intent.getIntExtra("MANAGERFLAG", 0);
         if (userRole == Role.User){
             //LinearLayout managerLayout = findViewById(R.id.managerLayout);
             //managerLayout.setVisibility(View.GONE);
             TextInputEditText edtEditComment = findViewById(R.id.edtEditComment);
-            edtEditComment.setEnabled(false);
+            edtEditComment.setFocusable(false);
             EditText edtEditMark = findViewById(R.id.edtEditMark);
-            edtEditMark.setEnabled(false);
+            edtEditMark.setFocusable(false);
             Button btnConfirm = findViewById(R.id.btnConfirm);
-            btnConfirm.setEnabled(false);
+            btnConfirm.setClickable(false);
+            Button btnGetConfirm = findViewById(R.id.btnPingConfirm);
+            btnGetConfirm.setVisibility(View.VISIBLE);
         }
-        if (managerIsViewingHisEdit){
+        if (userRole == Role.Manager && managerIsViewingHisEdit == 1){
             TextInputEditText edtEditComment = findViewById(R.id.edtEditComment);
-            edtEditComment.setEnabled(false);
+            edtEditComment.setFocusable(false);
             EditText edtEditMark = findViewById(R.id.edtEditMark);
-            edtEditMark.setEnabled(false);
+            edtEditMark.setFocusable(false);
             Button btnConfirm = findViewById(R.id.btnConfirm);
-            btnConfirm.setEnabled(false);
+            btnConfirm.setClickable(false);
         }
-        if (userRole == Role.Admin && managerIsViewingHisEdit){
+        if (userRole == Role.Admin && managerIsViewingHisEdit == 1){
             LinearLayout managerLayout = findViewById(R.id.managerLayout);
             managerLayout.setVisibility(View.GONE);
         }
@@ -109,6 +133,7 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         TextInputEditText edtComment = findViewById(R.id.edtEditComment);
         EditText edtMark = findViewById(R.id.edtEditMark);
         TextView txtTimeComment = findViewById(R.id.txtEditTimeComment);
+        //ImageView imgEdit = findViewById(R.id.imgDetail);
 
         PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
         PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
@@ -131,9 +156,12 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         spnStatus.setOnItemSelectedListener(null);
         spnStatus.setSelection(getIndexOfValueFromSpinner(spnStatus, infoDTO.getStatus()));
         spnStatus.setOnItemSelectedListener(spnStatusListener);
+        String imageName = infoDTO.getConfirmationImage();
+        oldImage = imageName;
+        downloadFromFireBase(imageName);
         if (managerDTO != null){
             edtComment.setText(managerDTO.getManagerComment());
-            edtMark.setText(managerDTO.getManagerMark());
+            edtMark.setText(managerDTO.getManagerMark()+"");
             txtTimeComment.setText(JDBCUtils.fromTimestampToString(managerDTO.getManagerCommentBeginTime()));
         }else{
             txtTimeComment.setText(getCurrentDate());
@@ -145,6 +173,8 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         switch (confirm){
             case "Not Confirmed":
             case "Waiting":
+                btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.LTGRAY));
+                btnConfirm.setTextColor(Color.BLACK);
                 break;
             case "Accepted":
                 btnConfirm.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
@@ -282,7 +312,7 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             String comment = null;
             String mark = null;
             Timestamp dateComment = null;
-            if (userRole == Role.Manager){
+            if (userRole == Role.Manager || userRole == Role.Admin){
                 comment = ((TextInputEditText)findViewById(R.id.edtEditComment)).getText().toString();
                 mark = ((EditText)findViewById(R.id.edtEditMark)).getText().toString();
                 //if (mark == null || mark.isEmpty()) mark = "-1";
@@ -290,8 +320,12 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
                 dateComment = JDBCUtils.fromStringToTime(txtTimeComment);
             }
 
-            String image = "image.png";
-            byte[] confirmationI = JDBCUtils.fromStringToBytes(image);
+            String imageName = null;
+            if (imageIsEdited == true){
+                imageName = UUID.randomUUID().toString();
+            }else{
+                imageName = oldImage;
+            }
 
             //Validate
             UserDAO userDAO = new UserDAO();
@@ -300,7 +334,7 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
             if (handlingContent.isEmpty()) error += "Handling content is empty\n";
             if (!userDAO.checkUsernameIsExisted(creator)) error += "Creator not existed\n";
             if (!userDAO.checkUsernameIsExisted(taskHandler)) error += "Task Handler not existed\n";
-            if (userRole == Role.Manager){
+            if (userRole == Role.Manager || userRole == Role.Admin){
                 if (comment.isEmpty()) error += "Comment is empty\n";
                 if (mark == null || mark.isEmpty()) error += "Please add mark\n";
 
@@ -310,13 +344,17 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
                 PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
                 PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
                 PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
-                PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
+                PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, imageName);
                 infoDTO.setId(thisTaskId);
                 //System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
                 if (infoDAO.updateTask(infoDTO)){
+                    if (imageIsEdited == true){
+                        deleteFromFireBase(oldImage);
+                        uploadToFireBase(selectedImage, imageName);
+                    }
                     PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(thisTaskId, dateBegin, dateFinish, dateCreated);
                     //System.out.println(thisTaskId + dateBegin.toString() + dateFinish.toString() + dateCreated.toString());
-                    if (userRole == Role.Manager){
+                    if (userRole == Role.Manager || userRole == Role.Admin){
                         PersonalTaskManagerDTO managerDTO = new PersonalTaskManagerDTO(thisTaskId, comment, Integer.parseInt(mark), dateComment);
                         if (managerDAO.updateTask(managerDTO));
                         else{
@@ -362,11 +400,10 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
     private void deleteThisTask(){
         try {
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
-            PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-            PersonalTaskManagerDAO managerDAO = new PersonalTaskManagerDAO();
             boolean result = infoDAO.deleteTask(thisTaskId) ;
             if (result){
                 Toast.makeText(this, "Delete task successfully", Toast.LENGTH_SHORT ).show();
+                deleteFromFireBase(oldImage);
                 Intent intent = this.getIntent();
                 this.setResult(RESULT_OK, intent);
                 finish();
@@ -390,4 +427,127 @@ public class TaskViewDetailActivity extends AppCompatActivity implements DatePic
         alertDialog.show();
     }
 
+    private final int GALLERY_REQUEST_CODE = 14785;
+    public void onClickEditImage(View view) {
+        //Create an Intent with action as ACTION_PICK
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        // Sets the type as image/*. This ensures only components of type image are selected
+        intent.setType("image/*");
+        //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
+        String[] mimeTypes = {"image/jpeg"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+        // Launching the Intent
+        startActivityForResult(intent,GALLERY_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Result code is RESULT_OK only if the user selects an Image
+        if (resultCode == Activity.RESULT_OK)
+            switch (requestCode){
+                case GALLERY_REQUEST_CODE:
+                    //data.getData returns the content URI for the selected Image
+                    Uri image = data.getData();
+                    selectedImage = image;
+                    imageIsEdited = true;
+                    ImageView imageView = findViewById(R.id.imgDetail);
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
+                        imageView.setImageBitmap(bitmap);
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+    }
+
+    private void uploadToFireBase(Uri file, String fileName){
+        if(file != null)
+        {
+            StorageReference ref = storageReference.child("images/"+ fileName);
+            ref.putFile(file)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    });
+        }
+    }
+
+    private void downloadFromFireBase(String filename){
+        if (filename != null){
+            try {
+                StorageReference ref = storageReference.child("images/" + filename);
+                final long ONE_MEGABYTE = 1024 * 1024;
+                ref.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        ImageView imageView = findViewById(R.id.imgDetail);
+                        imageView.setImageBitmap(bm);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void deleteFromFireBase(String filename){
+        if (filename != null){
+            try {
+                StorageReference ref = storageReference.child("images/" + filename);
+                ref.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        System.out.println("SUCCESS");
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void onclickChangeConfirm(View view) {
+        Button btnConfirm = findViewById(R.id.btnConfirm);
+        String confirm = btnConfirm.getText().toString();
+        switch (confirm){
+            case "Not Confirmed":
+                btnConfirm.setText("Waiting");
+                formatBtnConfirm(btnConfirm);
+                break;
+            case "Waiting":
+                btnConfirm.setText("Accepted");
+                formatBtnConfirm(btnConfirm);
+                break;
+            case "Accepted":
+                btnConfirm.setText("Denied");
+                formatBtnConfirm(btnConfirm);
+                break;
+            case "Denied":
+                btnConfirm.setText("Not Confirmed");
+                formatBtnConfirm(btnConfirm);
+                break;
+        }
+    }
 }

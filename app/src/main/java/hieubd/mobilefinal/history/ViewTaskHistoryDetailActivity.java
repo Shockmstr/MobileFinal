@@ -2,16 +2,24 @@ package hieubd.mobilefinal.history;
 
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import hieubd.dao.PersonalTaskManagerDAO;
 import hieubd.dao.PersonalTaskTimeDAO;
@@ -27,11 +35,15 @@ public class ViewTaskHistoryDetailActivity extends AppCompatActivity {
     private Role userRole;
     private String username;
     private PersonalTaskInfoDTO infoDTO;
+    private FirebaseStorage storage; // used to create a FirebaseStorage instance
+    private StorageReference storageReference; // point to the uploaded file
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_task_history_detail);
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
         getInfoFromIntent();
         autoFillAllDetails();
     }
@@ -78,9 +90,11 @@ public class ViewTaskHistoryDetailActivity extends AppCompatActivity {
         txtStatus.setText(infoDTO.getStatus());
         btnConfirm.setText(infoDTO.getConfirmation());
         formatBtnConfirm(btnConfirm);
+        String imageName = infoDTO.getConfirmationImage();
+        downloadFromFireBase(imageName);
         if (managerDTO != null){
             edtComment.setText(managerDTO.getManagerComment());
-            edtMark.setText(managerDTO.getManagerMark());
+            edtMark.setText(managerDTO.getManagerMark()+"");
             txtTimeComment.setText(JDBCUtils.fromTimestampToString(managerDTO.getManagerCommentBeginTime()));
         }
     }
@@ -105,5 +119,29 @@ public class ViewTaskHistoryDetailActivity extends AppCompatActivity {
     public void onClickReturn(View view) {
         setResult(RESULT_OK);
         finish();
+    }
+
+    private void downloadFromFireBase(String filename){
+        if (filename != null){
+            try {
+                StorageReference ref = storageReference.child("images/" + filename);
+                final long ONE_MEGABYTE = 1024 * 1024;
+                ref.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap bm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        ImageView imageView = findViewById(R.id.imgHistory);
+                        imageView.setImageBitmap(bm);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 }

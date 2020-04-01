@@ -12,13 +12,13 @@ public class PersonalTaskInfoDTO implements Serializable {
     private Role creatorRole;
     private String taskHandler;
     private String confirmation;
-    private byte[] confirmationImage;
+    private String confirmationImage;
 
     public PersonalTaskInfoDTO() {
 
     }
 
-    public PersonalTaskInfoDTO(String name, String description, String handlingContent, String status, String creator, String taskHandler, String confirmation, byte[] confirmationImage) {
+    public PersonalTaskInfoDTO(String name, String description, String handlingContent, String status, String creator, String taskHandler, String confirmation, String confirmationImage) {
         this.name = name;
         this.description = description;
         this.handlingContent = handlingContent;
@@ -93,11 +93,11 @@ public class PersonalTaskInfoDTO implements Serializable {
         this.confirmation = confirmation;
     }
 
-    public byte[] getConfirmationImage() {
+    public String getConfirmationImage() {
         return confirmationImage;
     }
 
-    public void setConfirmationImage(byte[] confirmationImage) {
+    public void setConfirmationImage(String confirmationImage) {
         this.confirmationImage = confirmationImage;
     }
 

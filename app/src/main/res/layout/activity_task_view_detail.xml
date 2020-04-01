@@ -203,9 +203,33 @@
                 android:text="Confirmation:"
                 android:textSize="18sp"/>
             <Button
+                android:onClick="onclickChangeConfirm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/btnConfirm"/>
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="50sp"
+                android:text="Get Confirm"
+                android:visibility="gone"
+                android:id="@+id/btnPingConfirm"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Edit Image"
+                android:onClick="onClickEditImage"/>
+            <ImageView
+                android:id="@+id/imgDetail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:scaleType="centerInside"/>
         </LinearLayout>
 
         <LinearLayout

@@ -92,7 +92,8 @@ public class UserListDetailActivity extends AppCompatActivity {
         UserDAO userDAO = new UserDAO();
 
         String error = "";
-        if (userDAO.checkUsernameIsExisted(txtUsername.getText().toString())) error += "Username is existed!\n";
+        String name = txtUsername.getText().toString();
+        if (userDAO.checkUsernameIsExisted(name) && (!name.equals(userDTO.getUsername()))) error += "Username is existed!\n";
         if (txtUsername.getText().toString().isEmpty()) error += "Username is empty\n";
         if (txtPassword.getText().toString().isEmpty()) error += "Password is empty\n";
         if (txtFullname.getText().toString().isEmpty()) error += "Fullname is empty\n";
@@ -109,10 +110,13 @@ public class UserListDetailActivity extends AppCompatActivity {
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             try{
                 List<Integer> taskIdList = infoDAO.getAllTaskIDByCreatorOrHandler(userDTO.getUsername());
+                if (taskIdList != null)
                 infoDAO.updateAllTaskByCreatorOrHandlerBefore(userDTO.getUsername(), taskIdList);
                 if (userDAO.updateUser(newUser)){
                     Toast.makeText(getBaseContext(), "Update user success", Toast.LENGTH_SHORT).show();
-                    infoDAO.updateAllTaskByCreatorOrHandlerAfter(newUser.getUsername(), taskIdList);
+                    if (taskIdList != null){
+                        infoDAO.updateAllTaskByCreatorOrHandlerAfter(newUser.getUsername(), taskIdList);
+                    }
                     Intent intent = this.getIntent();
                     setResult(RESULT_OK, intent);
                     finish();

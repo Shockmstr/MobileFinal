@@ -1,46 +1,64 @@
 package hieubd.mobilefinal;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import hieubd.dao.PersonalTaskInfoDAO;
 import hieubd.dao.PersonalTaskTimeDAO;
 import hieubd.dto.PersonalTaskInfoDTO;
 import hieubd.dto.PersonalTaskTimeDTO;
 import hieubd.dto.Role;
-import hieubd.jdbc.JDBCUtils;
 
 public class TaskInfoActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
+    private static final int GALLERY_REQUEST_CODE = 3333;
     private int getDateNumberFlag = -1;
     private String selectedStatus;
     private Role userRole;
     private String username;
+    private FirebaseStorage storage; // used to create a FirebaseStorage instance
+    private StorageReference storageReference; // point to the uploaded file
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_info);
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
         Intent intent = this.getIntent();
         userRole = (Role) intent.getSerializableExtra("ROLE");
         username = intent.getStringExtra("USERNAME");
@@ -142,13 +160,14 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
             String taskHandler = ((TextInputEditText)findViewById(R.id.edtTaskHandler)).getText().toString();
 
 
-            byte[] confirmationI = JDBCUtils.fromStringToBytes("image.png");
+            String imageName = UUID.randomUUID().toString();
 
             PersonalTaskInfoDAO infoDAO = new PersonalTaskInfoDAO();
             PersonalTaskTimeDAO timeDAO = new PersonalTaskTimeDAO();
-            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, confirmationI);
+            PersonalTaskInfoDTO infoDTO = new PersonalTaskInfoDTO(name, description, handlingContent, status, creator, taskHandler, confirm, imageName);
             //System.out.println(name + description + handlingContent + status + creator + taskHandler + confirm);
             if (infoDAO.createNewTask(infoDTO, userRole)){
+                uploadToFireBase(selectedImage, imageName);
                 int id = infoDAO.getNewTaskId();
                 infoDTO.setId(id);
                 PersonalTaskTimeDTO timeDTO = new PersonalTaskTimeDTO(id, dateBegin, dateFinish, dateCreated);
@@ -171,4 +190,59 @@ public class TaskInfoActivity extends AppCompatActivity implements DatePickerDia
         }
     }
 
+    public void onClickAddImage(View view) {
+        //Create an Intent with action as ACTION_PICK
+        Intent intent=new Intent(Intent.ACTION_PICK);
+        // Sets the type as image/*. This ensures only components of type image are selected
+        intent.setType("image/*");
+        //We pass an extra array with the accepted mime types. This will ensure only components with these MIME types as targeted.
+        String[] mimeTypes = {"image/jpeg"};
+        intent.putExtra(Intent.EXTRA_MIME_TYPES,mimeTypes);
+        // Launching the Intent
+        startActivityForResult(intent,GALLERY_REQUEST_CODE);
+    }
+
+    private Uri selectedImage;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Result code is RESULT_OK only if the user selects an Image
+        if (resultCode == Activity.RESULT_OK)
+            switch (requestCode){
+                case GALLERY_REQUEST_CODE:
+                    //data.getData returns the content URI for the selected Image
+                    Uri image = data.getData();
+                    selectedImage = image;
+                    ImageView imageView = findViewById(R.id.imgNew);
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), image);
+                        imageView.setImageBitmap(bitmap);
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+    }
+
+    private void uploadToFireBase(Uri file, String fileName){
+        if(file != null)
+        {
+            StorageReference ref = storageReference.child("images/"+ fileName);
+            ref.putFile(file)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                        }
+                    });
+        }
+    }
 }
+

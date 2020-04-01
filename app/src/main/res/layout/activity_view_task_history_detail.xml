@@ -181,6 +181,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:textSize="18sp"
+                android:layout_marginLeft="10sp"
                 android:id="@+id/txtHistoryStatus"/>
         </LinearLayout>
 
@@ -200,6 +202,16 @@
                 android:id="@+id/btnHistoryConfirm"/>
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imgHistory"
+                android:scaleType="centerInside"/>
+        </LinearLayout>
         <LinearLayout
             android:id="@+id/managerLayout"
             android:layout_width="match_parent"
